@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+  <title>Hello</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div class="container">
+  <div th:replace="fragments/bodyHeader :: bodyHeader" />
+  <div class="jumbotron">
+    <h1>HELLO</h1>
+    <p class="lead">
+    <span th:if="${session.username != null}" th:text="${session.username + '님 반갑습니다'}"></span>
+    <span th:unless="${session.username != null}">회원 기능</span>
+    <p>
+    <th:block th:unless="${session.username != null}">
+    <a class="btn btn-lg btn-secondary" href="/member/memberJoinForm">회원 가입</a>
+    </th:block>
+      <th:block th:if="${session.username != null}">
+        <a class="btn btn-lg btn-secondary" href="/member/memberLogout">로그아웃</a>
+      </th:block>
+      <th:block th:unless="${session.username != null}">
+        <a class="btn btn-lg btn-secondary" href="/member/memberLoginForm">로그인</a>
+      </th:block>
+    </p>
+    <p class="lead">게시판</p>
+    <p>
+      <a class="btn btn-lg btn-dark" href="/board/boardForm">게시판 등록</a>
+      <a class="btn btn-lg btn-dark" href="/board/boardList">게시판 목록</a>
+    </p>
+    <p class="lead">마이페이지</p>
+    <p>
+      <a class="btn btn-lg btn-info" href="/order">회원 정보</a>
+      <a class="btn btn-lg btn-info" href="/board/boardInfo">내가 쓴 게시글</a>
+    </p>
+  </div>
+  <div th:replace="fragments/footer :: footer" />
+</div> <!-- /container -->
+</body>
+</html>

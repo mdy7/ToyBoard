@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<style>
+  .fieldError {
+    border-color: #bd2130;
+  }
+</style>
+<body>
+<div class="container">
+  <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+  <div class="container" style="margin-top:30px">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group">
+          <h5 th:text="'제목 : ' + ${board.title}"></h5>
+        </div>
+        <div>
+          <td th:text="'작성자 : ' + ${board.createdBy}"></td>
+          <br><br>
+        </div>
+        <h5> 내용 </h5>
+        <div style="border:1px solid; padding:10px;">
+          <dl>
+            <dd th:text="${board.content}"></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <button type="button" class="btn btn-primary" onclick="location.href='/board/boardList/'">목록으로</button>
+    <button type="button" class="btn btn-primary"
+            th:if="${board.createdBy eq session.username}"
+            th:onclick="|location.href='/board/boardUpdate/' + ${board.id}|">수정
+    </button>
+
+    <button type="button" class="btn btn-primary" th:if="${board.createdBy eq session.username}"
+            th:onclick="|location.href='/board/boardDelete/' + ${board.id}|">삭제</button>
+  </div>
+
+  <br/>
+  <div th:replace="fragments/footer :: footer" />
+</div> <!-- /container -->
+</body>
+</html>
