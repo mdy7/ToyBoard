@@ -3,10 +3,9 @@ package article.demo.domain;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "board")
@@ -27,7 +26,7 @@ public class Board extends BaseTimeEntity{
 
 
     @Builder
-    public Board(String title, String content, String createdBy, Long countVisit, Member member) {
+    public Board(String title, String content, String createdBy, Long countVisit) {
         this.title = title;
         this.content = content;
         this.createdBy = createdBy;

@@ -1,14 +1,9 @@
 package article.demo.dto;
 
 import article.demo.domain.Member;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class MemberDto {
 
     private Long id;
@@ -30,9 +25,5 @@ public class MemberDto {
                 .email(email)
                 .build();
 
-    }
-
-    public void encodePassword(String encodedPassword) {
-        this.password = encodedPassword;
     }
 }

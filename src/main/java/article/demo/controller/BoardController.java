@@ -2,7 +2,10 @@ package article.demo.controller;
 
 
 import article.demo.domain.Board;
+import article.demo.domain.BoardComment;
+import article.demo.dto.BoardCommentDto;
 import article.demo.dto.BoardDto;
+import article.demo.service.BoardCommentService;
 import article.demo.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +26,10 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardCommentService boardCommentService;
 
     @GetMapping("/boardForm")
-    public String boardForm(Model model) {
+    public String boardForm() {
         return "board/boardForm";
     }
 
@@ -56,34 +60,47 @@ public class BoardController {
     @GetMapping("/boardContent/{id}")
     public String boardContent(@PathVariable("id") Long id, Model model) {
         Board board = boardService.updateVisit(id);
+        List<BoardComment> comments = boardCommentService.findCommentBoardId(id);
+
+        model.addAttribute("comments",comments);
         model.addAttribute(board);
         return "/board/boardContent";
     }
 
+    @PostMapping("/boardContent/{id}")
+    public String addComment(@PathVariable("id") Long id, BoardCommentDto boardCommentDto, HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        boardCommentService.saveBoardComment(id, boardCommentDto, username);
+        return "redirect:/board/boardContent/" + id;
+    }
+
     @GetMapping("/boardInfo")
     public String boardInfo(HttpSession session,Model model) {
-        List<Board> userBoards = boardService.findBoardByUsername(session);
+        String username = (String) session.getAttribute("username");
+        List<Board> userBoards = boardService.findBoardByUsername(username);
         model.addAttribute("userBoards", userBoards);
         return "/board/boardInfo";
     }
 
     @GetMapping("/boardUpdate/{id}")
     public String boardUpdateForm(@PathVariable("id") Long id,Model model,HttpSession session) {
-        Board board = boardService.findById(id,session);
+        String username = (String) session.getAttribute("username");
+        Board board = boardService.findById(id,username);
         model.addAttribute("board", board);
         return "board/boardUpdate";
     }
 
     @PostMapping("/boardUpdate/{id}")
-    public String boardUpdate(@PathVariable("id") Long id,BoardDto boardDto,HttpSession session,Model model) {
-        boardService.updateBoard(id,boardDto,session);
+    public String boardUpdate(@PathVariable("id") Long id,BoardDto boardDto,HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        boardService.updateBoard(id,boardDto,username);
         return "redirect:/board/boardContent/" + id;
     }
 
     @GetMapping("/boardDelete/{id}")
     public String boardDelete(@PathVariable("id") Long id,HttpSession session) {
-        boardService.deleteBoard(id,session);
+        String username = (String) session.getAttribute("username");
+        boardService.deleteBoard(id,username);
         return "redirect:/board/boardList";
     }
-
 }

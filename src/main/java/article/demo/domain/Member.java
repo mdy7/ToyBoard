@@ -1,10 +1,7 @@
 package article.demo.domain;
 
-
-import article.demo.dto.MemberDto;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

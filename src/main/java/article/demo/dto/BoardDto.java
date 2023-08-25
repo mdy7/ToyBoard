@@ -1,14 +1,9 @@
 package article.demo.dto;
 
 import article.demo.domain.Board;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class BoardDto {
 
     private Long id;
@@ -32,14 +27,6 @@ public class BoardDto {
                 .createdBy(createdBy)
                 .countVisit(countVisit)
                 .build();
-    }
-
-    public BoardDto(Board board) {
-        id = board.getId();
-        title = board.getTitle();
-        content = board.getContent();
-        createdBy = board.getCreatedBy();
-        countVisit = board.getCountVisit();
     }
 
     public void boardSetting(String createdBy, Long countVisit) {

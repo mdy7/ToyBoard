@@ -46,11 +46,4 @@ public class MemberController {
         session.invalidate();
         return "redirect:/";
     }
-
-    @ResponseBody
-    @GetMapping("/checkSession")
-    public String checkSession(HttpSession session){
-        log.info("checkSession = {}",session.getAttribute("username"));
-        return "Session";
-    }
 }

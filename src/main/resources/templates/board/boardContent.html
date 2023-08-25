@@ -20,7 +20,7 @@
           <br><br>
         </div>
         <h5> 내용 </h5>
-        <div style="border:1px solid; padding:10px;">
+        <div>
           <dl>
             <dd th:text="${board.content}"></dd>
           </dl>
@@ -28,16 +28,37 @@
       </div>
     </div>
     <br>
-
     <button type="button" class="btn btn-primary" onclick="location.href='/board/boardList/'">목록으로</button>
     <button type="button" class="btn btn-primary"
             th:if="${board.createdBy eq session.username}"
             th:onclick="|location.href='/board/boardUpdate/' + ${board.id}|">수정
     </button>
-
     <button type="button" class="btn btn-primary" th:if="${board.createdBy eq session.username or session.username eq 'admin'}"
             th:onclick="|location.href='/board/boardDelete/' + ${board.id}|">삭제</button>
   </div>
+<!--댓글-->
+  <div class="card mt-3">
+    <div class="card-body">
+      <h5 class="card-title">댓글 작성</h5>
+      <form th:action="@{'/board/boardContent/' + ${board.id}}" method="post">
+        <input type="hidden" th:name="boardId" th:value="${board.id}" />
+        <textarea class="form-control" id="content" rows="3" name="content" placeholder="댓글을 작성하세요"></textarea>
+        <button type="submit" class="btn btn-dark mt-3">댓글 작성</button>
+      </form>
+    </div>
+  </div>
+  <!-- 댓글 목록 -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <h5 class="card-title">댓글 목록</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" th:each="comment : ${comments}">
+          <strong th:text="${comment.getCreatedBy}"></strong>: <span th:text="${comment.content}"></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+<!--  댓글-->
   <br/>
   <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
