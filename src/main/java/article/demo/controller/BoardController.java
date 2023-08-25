@@ -3,7 +3,6 @@ package article.demo.controller;
 
 import article.demo.domain.Board;
 import article.demo.dto.BoardDto;
-import article.demo.repository.BoardRepository;
 import article.demo.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -41,9 +39,10 @@ public class BoardController {
     @GetMapping("/boardList")
     public String boardList(Model model,
                             @RequestParam(required = false, defaultValue = "") String searchText,
+                            @RequestParam(required = false, defaultValue = "") String searchType,
                             @PageableDefault(page = 0, size = 10,sort = "id",direction = Sort.Direction.DESC)
                             Pageable pageable) {
-        Page<Board> boards = boardService.boardSearch(searchText,pageable);
+        Page<Board> boards = boardService.searchBoard(searchText,searchType,pageable);
 
         int startPage = Math.max(1, boards.getPageable().getPageNumber() - 1);
         int endPage = Math.min(boards.getTotalPages(), boards.getPageable().getPageNumber() + 3);
@@ -54,20 +53,9 @@ public class BoardController {
         return "board/boardList";
     }
 
-
-//    @GetMapping("/boardList")
-//    public String boardList(@RequestParam(name = "keyword", required = false, defaultValue = "") String keyword,
-//                            @PageableDefault(size = 3) Pageable pageable, Model model) {
-//        Page<Board> searchPage = boardService.keywordSearchPageable(keyword, pageable);
-//        model.addAttribute("boards", searchPage);
-//        model.addAttribute("keyword", keyword);
-//        return "board/boardList";
-//    }
-
-
     @GetMapping("/boardContent/{id}")
     public String boardContent(@PathVariable("id") Long id, Model model) {
-        Board board = boardService.findById(id);
+        Board board = boardService.updateVisit(id);
         model.addAttribute(board);
         return "/board/boardContent";
     }
@@ -80,21 +68,21 @@ public class BoardController {
     }
 
     @GetMapping("/boardUpdate/{id}")
-    public String boardUpdateForm(@PathVariable("id") Long id,Model model) {
-        Board board = boardService.findById(id);
+    public String boardUpdateForm(@PathVariable("id") Long id,Model model,HttpSession session) {
+        Board board = boardService.findById(id,session);
         model.addAttribute("board", board);
         return "board/boardUpdate";
     }
 
     @PostMapping("/boardUpdate/{id}")
-    public String boardUpdate(@PathVariable("id") Long id,BoardDto boardDto,Model model) {
-        boardService.updateBoard(id,boardDto);
+    public String boardUpdate(@PathVariable("id") Long id,BoardDto boardDto,HttpSession session,Model model) {
+        boardService.updateBoard(id,boardDto,session);
         return "redirect:/board/boardContent/" + id;
     }
 
     @GetMapping("/boardDelete/{id}")
-    public String boardDelete(@PathVariable("id") Long id) {
-        boardService.deleteBoard(id);
+    public String boardDelete(@PathVariable("id") Long id,HttpSession session) {
+        boardService.deleteBoard(id,session);
         return "redirect:/board/boardList";
     }
 

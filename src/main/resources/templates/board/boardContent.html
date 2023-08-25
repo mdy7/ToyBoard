@@ -35,10 +35,9 @@
             th:onclick="|location.href='/board/boardUpdate/' + ${board.id}|">수정
     </button>
 
-    <button type="button" class="btn btn-primary" th:if="${board.createdBy eq session.username}"
+    <button type="button" class="btn btn-primary" th:if="${board.createdBy eq session.username or session.username eq 'admin'}"
             th:onclick="|location.href='/board/boardDelete/' + ${board.id}|">삭제</button>
   </div>
-
   <br/>
   <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
