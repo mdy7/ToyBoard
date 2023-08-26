@@ -4,7 +4,9 @@ package article.demo.controller;
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
 import article.demo.dto.BoardCommentDto;
+import article.demo.dto.BoardCommentReplyDto;
 import article.demo.dto.BoardDto;
+import article.demo.service.BoardCommentReplyService;
 import article.demo.service.BoardCommentService;
 import article.demo.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,7 @@ public class BoardController {
 
     private final BoardService boardService;
     private final BoardCommentService boardCommentService;
-
+    private final BoardCommentReplyService boardCommentReplyService;
     @GetMapping("/boardForm")
     public String boardForm() {
         return "board/boardForm";
@@ -108,6 +110,14 @@ public class BoardController {
     public String deleteComment(@PathVariable("id") Long commentId,Long boardId,HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.deleteCommentById(commentId,username);
+        return "redirect:/board/boardContent/" + boardId;
+    }
+
+    @PostMapping("/addReply/{commentId}")
+    public String addReply(@PathVariable Long commentId,Long boardId, BoardCommentReplyDto boardCommentReplyDto,
+                           HttpSession session, Model model) {
+        String username = (String) session.getAttribute("username");
+        boardCommentReplyService.saveBoardCommentReply(commentId, boardCommentReplyDto, username);
         return "redirect:/board/boardContent/" + boardId;
     }
 }

@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @Table(name = "board_reply")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BoardReply extends BaseTimeEntity{
+public class BoardCommentReply extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reply_id")
@@ -29,7 +29,7 @@ public class BoardReply extends BaseTimeEntity{
     private Member member;
 
     @Builder
-    public BoardReply(String content, String createdBy, BoardComment boardComment, Member member) {
+    public BoardCommentReply(String content, String createdBy, BoardComment boardComment, Member member) {
         this.content = content;
         this.createdBy = createdBy;
         this.boardComment = boardComment;

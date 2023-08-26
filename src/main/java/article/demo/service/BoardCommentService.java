@@ -3,8 +3,11 @@ package article.demo.service;
 
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
+import article.demo.domain.BoardCommentReply;
 import article.demo.domain.Member;
 import article.demo.dto.BoardCommentDto;
+import article.demo.dto.BoardCommentReplyDto;
+import article.demo.repository.BoardCommentReplyRepository;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
@@ -25,6 +28,9 @@ public class BoardCommentService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
+    /**
+     * 댓글 저장
+     */
     @Transactional
     public void saveBoardComment(Long id, BoardCommentDto boardCommentDto,String username) {
         if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
@@ -43,13 +49,23 @@ public class BoardCommentService {
                 .content(boardCommentDto.getContent())
                 .build();
 
+
         boardCommentRepository.save(boardComment);
     }
 
+
+    /**
+     * 댓글 조회
+     */
     public List<BoardComment> findCommentBoardId(Long id) {
         return boardCommentRepository.findByBoardId(id);
     }
 
+
+
+    /**
+     * 댓글 삭제
+     */
     @Transactional
     public void deleteCommentById(Long commentId,String username) {
         BoardComment comment = boardCommentRepository.findById(commentId)

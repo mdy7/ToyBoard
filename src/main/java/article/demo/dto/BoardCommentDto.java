@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 public class BoardCommentDto {
     private Long id;
     private String content;
-    private LocalDateTime createdData;
     private String createdBy;
     private Character deleteCheck;
 
@@ -20,9 +19,8 @@ public class BoardCommentDto {
 
 
     @Builder
-    public BoardCommentDto(String content, LocalDateTime createdDate, String createdBy, Character deleteCheck, Board board, Member member) {
+    public BoardCommentDto(String content, String createdBy, Character deleteCheck, Board board, Member member) {
         this.content = content;
-        this.createdData = createdDate;
         this.createdBy = createdBy;
         this.deleteCheck = deleteCheck;
         this.board = board;
