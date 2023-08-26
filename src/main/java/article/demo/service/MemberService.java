@@ -22,7 +22,7 @@ public class MemberService{
      */
     @Transactional
     public Long join(MemberDto memberDto) {
-        validateNullCheckMember(memberDto);
+        nullCheckMember(memberDto);
 
         memberRepository.findByUsername(memberDto.getUsername()).ifPresent( a -> {
             throw new IllegalArgumentException("이미 존재하는 아이디 입니다");
@@ -36,10 +36,10 @@ public class MemberService{
      * 로그인
      */
     public void login(MemberDto memberDto){
-        validateNullCheckMember(memberDto);
+        nullCheckMember(memberDto);
 
-        Member member = memberRepository.findByUsername(memberDto.getUsername()).orElseThrow((() ->
-                new IllegalStateException("존재하지 않는 아이디 입니다")));
+        Member member = memberRepository.getUsername(memberDto.getUsername());
+
         if (!memberDto.getPassword().equals(member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
@@ -48,7 +48,7 @@ public class MemberService{
     /**
      * 검증
      */
-    private void validateNullCheckMember(MemberDto memberDto) {
+    private void nullCheckMember(MemberDto memberDto) {
         if (memberDto.getUsername() == null || memberDto.getUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("아이디를 입력해주세요");
         }

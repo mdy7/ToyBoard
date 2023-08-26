@@ -12,13 +12,12 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "board_comment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BoardComment {
+public class BoardComment extends BaseTimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_comment_id")
     private Long id;
     private String content;
-    private LocalDateTime createdData;
     private String createdBy;
     private Character deleteCheck;
 
@@ -31,9 +30,8 @@ public class BoardComment {
     private Member member;
 
     @Builder
-    public BoardComment(String content, LocalDateTime createdData, String createdBy, Character deleteCheck, Board board, Member member) {
+    public BoardComment(String content, String createdBy, Character deleteCheck, Board board, Member member) {
         this.content = content;
-        this.createdData = createdData;
         this.createdBy = createdBy;
         this.deleteCheck = deleteCheck;
         this.board = board;

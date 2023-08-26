@@ -74,18 +74,18 @@ public class BoardController {
         return "redirect:/board/boardContent/" + id;
     }
 
-    @GetMapping("/boardInfo")
-    public String boardInfo(HttpSession session,Model model) {
+    @GetMapping("/myBoard")
+    public String boardMyBoard(HttpSession session,Model model) {
         String username = (String) session.getAttribute("username");
-        List<Board> userBoards = boardService.findBoardByUsername(username);
+        List<Board> userBoards = boardService.myBoarder(username);
         model.addAttribute("userBoards", userBoards);
-        return "/board/boardInfo";
+        return "board/boardMyBoard";
     }
 
     @GetMapping("/boardUpdate/{id}")
     public String boardUpdateForm(@PathVariable("id") Long id,Model model,HttpSession session) {
         String username = (String) session.getAttribute("username");
-        Board board = boardService.findById(id,username);
+        Board board = boardService.updateForm(id,username);
         model.addAttribute("board", board);
         return "board/boardUpdate";
     }

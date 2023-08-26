@@ -36,7 +36,29 @@
     <button type="button" class="btn btn-primary" th:if="${board.createdBy eq session.username or session.username eq 'admin'}"
             th:onclick="|location.href='/board/boardDelete/' + ${board.id}|">삭제</button>
   </div>
-<!--댓글-->
+  <!-- 댓글 목록 -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <h5 class="card-title">댓글 목록</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" th:each="comment : ${comments}">
+          <strong th:text="${comment.getCreatedBy}"></strong>: <span th:text="${comment.content}"></span>
+          <!-- 대댓글 작성 폼 -->
+          <div class="reply-form mt-2" style="display: none;">
+            <form th:action="@{'/board/addReply/' + ${comment.id}}" method="post">
+              <input type="hidden" th:name="boardId" th:value="${board.id}" />
+              <input type="hidden" th:name="parentId" th:value="${comment.id}" />
+              <textarea class="form-control" rows="2" name="content" placeholder="대댓글을 작성하세요"></textarea>
+              <button type="submit" class="btn btn-sm btn-dark mt-1">대댓글 작성</button>
+            </form>
+          </div>
+          <!-- 대댓글 작성 폼 끝 -->
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- 댓글 목록 끝 -->
+  <!-- 댓글 작성 -->
   <div class="card mt-3">
     <div class="card-body">
       <h5 class="card-title">댓글 작성</h5>
@@ -47,17 +69,25 @@
       </form>
     </div>
   </div>
-  <!-- 댓글 목록 -->
-  <div class="card mt-3">
-    <div class="card-body">
-      <h5 class="card-title">댓글 목록</h5>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item" th:each="comment : ${comments}">
-          <strong th:text="${comment.getCreatedBy}"></strong>: <span th:text="${comment.content}"></span>
-        </li>
-      </ul>
-    </div>
-  </div>
+  <!-- 댓글 작성 끝 -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const replyForms = document.querySelectorAll(".reply-form");
+      const commentItems = document.querySelectorAll(".list-group-item");
+
+      commentItems.forEach((commentItem, index) => {
+        commentItem.addEventListener("click", () => {
+          replyForms.forEach((replyForm, replyIndex) => {
+            if (replyIndex === index) {
+              replyForm.style.display = replyForm.style.display === "none" ? "block" : "none";
+            } else {
+              replyForm.style.display = "none";
+            }
+          });
+        });
+      });
+    });
+  </script>
 <!--  댓글-->
   <br/>
   <div th:replace="fragments/footer :: footer" />

@@ -33,7 +33,6 @@ public class BoardCommentDto {
     public BoardComment toEntity() {
         return BoardComment.builder()
                 .content(content)
-                .createdData(createdData)
                 .createdBy(createdBy)
                 .deleteCheck(deleteCheck)
                 .member(member)

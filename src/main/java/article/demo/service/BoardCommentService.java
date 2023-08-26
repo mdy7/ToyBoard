@@ -5,6 +5,7 @@ import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
 import article.demo.domain.Member;
 import article.demo.dto.BoardCommentDto;
+import article.demo.dto.BoardDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,19 +25,20 @@ public class BoardCommentService {
     private final BoardCommentRepository boardCommentRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
-    private final BoardService boardService;
 
     @Transactional
     public void saveBoardComment(Long id, BoardCommentDto boardCommentDto,String username) {
-        Board board = boardRepository.findById(id).orElseThrow((() ->
-                new IllegalStateException("해당 게시글이 존재하지 않습니다")));
+        if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
+            throw new IllegalArgumentException("내용을 입력해주세요");
+        }
+
+        Board board = boardRepository.getBoard(id);
 
         Member member = memberRepository.findByUsername(username).orElseThrow((() ->
-                new IllegalStateException("존재하지 않는 아이디 입니다")));
+                new IllegalStateException("로그인 정보가 없습니다")));
 
         BoardComment boardComment = BoardComment.builder()
                 .createdBy(username)
-                .createdData(LocalDateTime.now())
                 .deleteCheck('N')
                 .member(member)
                 .board(board)
@@ -47,9 +48,8 @@ public class BoardCommentService {
         boardCommentRepository.save(boardComment);
     }
 
-
     public List<BoardComment> findCommentBoardId(Long id) {
-        List<BoardComment> comments = boardCommentRepository.findCommentBoardId(id);
-        return comments;
+        return boardCommentRepository.findByBoardId(id);
     }
+
 }

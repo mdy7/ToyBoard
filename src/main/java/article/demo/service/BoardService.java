@@ -2,8 +2,8 @@ package article.demo.service;
 
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
-import article.demo.domain.Member;
 import article.demo.dto.BoardDto;
+import article.demo.dto.MemberDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -33,6 +32,8 @@ public class BoardService {
      */
     @Transactional
     public void saveBoard(BoardDto boardDto, String username) {
+        nullCheckBoard(boardDto);
+
         if (username == null || username.isEmpty()) {
             boardDto.boardSetting("익명", 1L);
         } else {
@@ -47,17 +48,70 @@ public class BoardService {
     /**
      * 게시글 리스트 조회
      */
-    public Board findById(Long id,String username) {
-        Board board = boardRepository.findById(id).orElseThrow((() ->
-                new IllegalStateException("해당 게시글이 존재하지 않습니다")));
-        sessionValidation(username,id);
+    public Page<Board> searchBoard(String searchText, String searchType, Pageable pageable) {
+        Page<Board> boards;
+        switch (searchType) {
+            case "title":
+                boards = boardRepository.findByTitleContaining(searchText, pageable);
+                break;
+            case "content":
+                boards = boardRepository.findByContentContaining(searchText, pageable);
+                break;
+            case "createdBy":
+                boards = boardRepository.findByCreatedByContaining(searchText, pageable);
+                break;
+            default:
+                boards = boardRepository.findByTitleContainingOrContentContaining(searchText, searchText, pageable);
+                break;
+        }
+        return boards;
+    }
+
+    public List<Board> myBoarder(String username) {
+        List<Board> userBoards = boardRepository.findByCreatedByOrderByIdDesc(username);
+        return userBoards;
+    }
+
+
+    /**
+     * 게시글 수정
+     */
+    @Transactional
+    public void updateBoard(Long id, BoardDto boardDto, String username) {
+        writerValidation(username,id);
+        Board board = boardRepository.getBoard(id);
+        board.updateBoard(boardDto.getTitle(), boardDto.getContent());
+        boardRepository.save(board);
+    }
+
+    public Board updateForm(Long id, String username) {
+        Board board = boardRepository.getBoard(id);
+
+        writerValidation(username,id);
+
         return board;
     }
 
+
+    /**
+     * 게시글 삭제
+     */
+    @Transactional
+    public void deleteBoard(Long id, String username) {
+        writerValidation(username,id);
+
+        List<BoardComment> comments = boardCommentRepository.findByBoardId(id);
+        boardCommentRepository.deleteAll(comments);
+
+        boardRepository.deleteById(id);
+    }
+
+    /**
+     * 게시글 상세
+     */
     @Transactional
     public Board updateVisit(Long id) {
-        Board board = boardRepository.findById(id).orElseThrow((() ->
-                new IllegalStateException("해당 게시글이 존재하지 않습니다")));
+        Board board = boardRepository.getBoard(id);
 
         Long countVisit = board.getCountVisit() + 1L;
 
@@ -70,72 +124,26 @@ public class BoardService {
     }
 
 
-    public List<Board> findBoardByUsername(String username) {
-        List<Board> userBoards = boardRepository.findByCreatedByOrderByIdDesc(username);
-        return userBoards;
-    }
+    /**
+     * 검증
+     */
+    public void writerValidation(String username, Long id) {
+        memberRepository.findByUsername(username).orElseThrow((() ->
+                new IllegalStateException("로그인 정보가 없습니다.")));
 
-    public Page<Board> searchBoard(String searchText, String searchType, Pageable pageable) {
-        Page<Board> boards;
-        if ("title".equals(searchType)) {
-            boards = boardRepository.findByTitleContaining(searchText, pageable); // 제목으로 검색
-        } else if ("content".equals(searchType)) {
-            boards = boardRepository.findByContentContaining(searchText, pageable); // 내용으로 검색
-        } else if ("createdBy".equals(searchType)) {
-            boards = boardRepository.findByCreatedByContaining(searchText, pageable); // 작성자로 검색
-        } else {
-            boards = boardRepository.findByTitleContainingOrContentContaining(searchText, searchText, pageable); // 전체 검색
+        Board board = boardRepository.getBoard(id);
+
+        if (!board.getCreatedBy().equals(username) && !username.equals("admin")) {
+            throw new IllegalStateException("작성자가 아닙니다.");
         }
-        return boards;
     }
 
-    /**
-     * 게시글 수정
-     */
-    @Transactional
-    public void updateBoard(Long id, BoardDto boardDto, String username) {
-        sessionValidation(username,id);
-        Board board = boardRepository.findById(id).orElseThrow((() ->
-                new IllegalStateException("해당 게시글이 존재하지 않습니다")));
-        board.updateBoard(boardDto.getTitle(), boardDto.getContent());
-        boardRepository.save(board);
-    }
-
-
-    /**
-     * 게시글 삭제
-     */
-    @Transactional
-    public void deleteBoard(Long id, String username) {
-        sessionValidation(username,id);
-
-        List<BoardComment> comments = boardCommentRepository.findByBoardId(id);
-        boardCommentRepository.deleteAll(comments);
-
-        boardRepository.deleteById(id);
-    }
-
-
-    /**
-     * 게시판 작성자 검증
-     */
-    public void sessionValidation(String username,Long id){
-        Optional<Member> sessionMemberOptional = memberRepository.findByUsername(username);
-
-        if (sessionMemberOptional.isPresent()) {
-            Optional<Board> boardOptional = boardRepository.findById(id);
-            if (boardOptional.isPresent()) {
-                Board board = boardOptional.get();
-                String createdBy = board.getCreatedBy();
-                if (createdBy.equals(username) || username.equals("admin")) {
-                } else {
-                    throw new IllegalStateException("작성자가 아닙니다.");
-                }
-            } else {
-                throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다.");
-            }
-        } else {
-            throw new IllegalStateException("로그인 정보가 없습니다.");
+    private void nullCheckBoard(BoardDto boardDto) {
+        if (boardDto.getTitle() == null || boardDto.getTitle().isEmpty()) {
+            throw new IllegalArgumentException("제목을 입력해주세요");
+        }
+        if (boardDto.getContent() == null || boardDto.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("내용을 입력해주세요");
         }
     }
 }
