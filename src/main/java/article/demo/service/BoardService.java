@@ -127,9 +127,9 @@ public class BoardService {
      * 검증
      */
     public void writerValidation(String username, Long id) {
-        memberRepository.getUsernameBySession(username);
-
         Board board = boardRepository.getBoard(id);
+
+        memberRepository.getUsernameBySession(username);
 
         if (!board.getCreatedBy().equals(username) && !username.equals("admin")) {
             throw new IllegalStateException("작성자가 아닙니다.");
