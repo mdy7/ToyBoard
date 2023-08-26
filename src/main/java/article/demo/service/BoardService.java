@@ -3,7 +3,6 @@ package article.demo.service;
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
 import article.demo.dto.BoardDto;
-import article.demo.dto.MemberDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
@@ -128,8 +127,7 @@ public class BoardService {
      * 검증
      */
     public void writerValidation(String username, Long id) {
-        memberRepository.findByUsername(username).orElseThrow((() ->
-                new IllegalStateException("로그인 정보가 없습니다.")));
+        memberRepository.getUsernameBySession(username);
 
         Board board = boardRepository.getBoard(id);
 

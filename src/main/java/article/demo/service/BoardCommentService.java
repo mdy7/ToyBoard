@@ -5,7 +5,6 @@ import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
 import article.demo.domain.Member;
 import article.demo.dto.BoardCommentDto;
-import article.demo.dto.BoardDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
@@ -34,11 +33,10 @@ public class BoardCommentService {
 
         Board board = boardRepository.getBoard(id);
 
-        Member member = memberRepository.findByUsername(username).orElseThrow((() ->
-                new IllegalStateException("로그인 정보가 없습니다")));
+        Member member = memberRepository.getUsernameBySession(username);
 
         BoardComment boardComment = BoardComment.builder()
-                .createdBy(username)
+                .createdBy(member.getUsername())
                 .deleteCheck('N')
                 .member(member)
                 .board(board)
@@ -52,4 +50,21 @@ public class BoardCommentService {
         return boardCommentRepository.findByBoardId(id);
     }
 
+    @Transactional
+    public void deleteCommentById(Long commentId,String username) {
+        BoardComment comment = boardCommentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+
+        writerValidation(username,comment);
+
+        boardCommentRepository.delete(comment);
+    }
+
+    public void writerValidation(String username,BoardComment comment) {
+        memberRepository.getUsernameBySession(username);
+
+        if (!comment.getCreatedBy().equals(username) && !username.equals("admin")) {
+            throw new IllegalStateException("댓글 작성자가 아닙니다.");
+        }
+    }
 }

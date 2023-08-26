@@ -103,4 +103,11 @@ public class BoardController {
         boardService.deleteBoard(id,username);
         return "redirect:/board/boardList";
     }
+
+    @GetMapping("/boardDeleteComment/{id}")
+    public String deleteComment(@PathVariable("id") Long commentId,Long boardId,HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        boardCommentService.deleteCommentById(commentId,username);
+        return "redirect:/board/boardContent/" + boardId;
+    }
 }

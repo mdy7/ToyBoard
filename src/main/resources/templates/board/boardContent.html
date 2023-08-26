@@ -34,7 +34,7 @@
             th:onclick="|location.href='/board/boardUpdate/' + ${board.id}|">수정
     </button>
     <button type="button" class="btn btn-primary" th:if="${board.createdBy eq session.username or session.username eq 'admin'}"
-            th:onclick="|location.href='/board/boardDelete/' + ${board.id}|">삭제</button>
+            th:attr="data-board-id=${board.id}" th:onclick="|location.href='/board/boardDelete/' + ${board.id}|">삭제</button>
   </div>
   <!-- 댓글 목록 -->
   <div class="card mt-3">
@@ -43,6 +43,9 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item" th:each="comment : ${comments}">
           <strong th:text="${comment.getCreatedBy}"></strong>: <span th:text="${comment.content}"></span>
+          <!-- 댓글 삭제 버튼 -->
+          <button class="btn btn-sm btn-danger float-right" th:if="${comment.createdBy eq session.username or session.username eq 'admin'}"
+                  th:attr="data-board-id=${board.id}, data-comment-id=${comment.id}" onclick="deleteComment(this)">삭제</button>
           <!-- 대댓글 작성 폼 -->
           <div class="reply-form mt-2" style="display: none;">
             <form th:action="@{'/board/addReply/' + ${comment.id}}" method="post">
@@ -69,7 +72,17 @@
       </form>
     </div>
   </div>
-  <!-- 댓글 작성 끝 -->
+  <!-- 댓글 삭제 스크립트 -->
+  <script>
+    function deleteComment(button) {
+      const commentId = button.getAttribute('data-comment-id');
+      const boardId = button.getAttribute('data-board-id');
+      if (confirm('댓글을 삭제하시겠습니까?')) {
+        location.href = '/board/boardDeleteComment/' + commentId + '?boardId=' + boardId; ; // 실제 삭제 처리 URL로 변경
+      }
+    }
+  </script>
+  <!-- 대댓글 스크립트 -->
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const replyForms = document.querySelectorAll(".reply-form");
@@ -88,7 +101,6 @@
       });
     });
   </script>
-<!--  댓글-->
   <br/>
   <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
