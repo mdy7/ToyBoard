@@ -44,8 +44,20 @@
         <li class="list-group-item" th:each="comment : ${comments}">
           <strong th:text="${comment.getCreatedBy}"></strong>: <span th:text="${comment.content}"></span>
           <!-- 댓글 삭제 버튼 -->
-          <button class="btn btn-sm btn-danger float-right" th:if="${comment.createdBy eq session.username or session.username eq 'admin'}"
+          <button class="btn btn-sm btn-danger float-right"
+                  th:if="${comment.createdBy eq session.username or session.username eq 'admin'}"
                   th:attr="data-board-id=${board.id}, data-comment-id=${comment.id}" onclick="deleteComment(this)">삭제</button>
+          <!-- 대댓글 목록 -->
+          <ul class="list-group list-group-flush mt-2">
+            <li class="list-group-item" th:each="reply : ${commentRepliesMap.get(comment)}">
+              - &nbsp;&nbsp;<strong th:text="${reply.getCreatedBy}"></strong>: <span th:text="${reply.content}"></span>
+              <!-- 대댓글 삭제 버튼 -->
+              <button class="btn btn-sm btn-danger float-right"
+                      th:if="${reply.createdBy eq session.username or session.username eq 'admin'}"
+                      th:attr="data-board-id=${board.id}, data-comment-id=${comment.id}, data-reply-id=${reply.id}" onclick="deleteReply(this)">삭제</button>
+            </li>
+          </ul>
+          <!-- 대댓글 목록 끝 -->
           <!-- 대댓글 작성 폼 -->
           <div class="reply-form mt-2" style="display: none;">
             <form th:action="@{'/board/addReply/' + ${comment.id}}" method="post">
@@ -56,22 +68,11 @@
             </form>
           </div>
           <!-- 대댓글 작성 폼 끝 -->
-          <!-- 대댓글 목록 -->
-<!--          <ul class="list-group list-group-flush mt-2">
-            <li class="list-group-item" th:each="reply : ${comment.replies}">
-              <strong th:text="${reply.getCreatedBy}"></strong>: <span th:text="${reply.content}"></span>
-              &lt;!&ndash; 대댓글 삭제 버튼 &ndash;&gt;
-              <button class="btn btn-sm btn-danger float-right" th:if="${reply.createdBy eq session.username or session.username eq 'admin'}"
-                      th:attr="data-board-id=${board.id}, data-comment-id=${comment.id}, data-reply-id=${reply.id}" onclick="deleteReply(this)">삭제</button>
-            </li>
-          </ul>-->
-          <!-- 대댓글 목록 끝 -->
         </li>
       </ul>
     </div>
   </div>
   <!-- 댓글 목록 끝 -->
-
   <!-- 댓글 작성 -->
   <div class="card mt-3">
     <div class="card-body">
@@ -94,6 +95,7 @@
     }
   </script>
   <!-- 대댓글 스크립트 -->
+  <!-- 대댓글 스크립트 -->
   <script>
     function stopPropagation(event) {
       event.stopPropagation();
@@ -104,13 +106,13 @@
 
       commentItems.forEach((commentItem, index) => {
         commentItem.addEventListener("click", () => {
-          replyForms.forEach((replyForm, replyIndex) => {
-            if (replyIndex === index) {
-              replyForm.style.display = replyForm.style.display === "none" ? "block" : "none";
-            } else {
-              replyForm.style.display = "none";
+          const replyForm = commentItem.querySelector(".reply-form");
+          replyForms.forEach((form) => {
+            if (form !== replyForm) {
+              form.style.display = "none"; // 다른 대댓글 폼은 숨김
             }
           });
+          replyForm.style.display = replyForm.style.display === "none" ? "block" : "none";
         });
       });
     });
