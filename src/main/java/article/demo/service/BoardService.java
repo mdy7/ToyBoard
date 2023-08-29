@@ -104,7 +104,7 @@ public class BoardService {
         writerValidation(username,id);
 
         List<BoardComment> comments = boardCommentRepository.findByBoardId(id);
-        boardCommentRepository.deleteAll(comments);
+        boardCommentRepository.deleteAll(comments); // 댓글 먼저 삭제후 게시글 삭제
 
         boardRepository.deleteById(id);
     }
