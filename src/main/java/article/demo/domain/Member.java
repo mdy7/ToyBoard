@@ -1,5 +1,6 @@
 package article.demo.domain;
 
+import article.demo.dto.MemberDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,8 +35,12 @@ public class Member extends BaseTimeEntity{
 
     private String email;
 
+    @Builder.Default
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Board> board = new ArrayList<>();
 
-
+    public void update(String password,String email){
+        this.password = password;
+        this.email = email;
+    }
 }

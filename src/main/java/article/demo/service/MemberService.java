@@ -28,7 +28,13 @@ public class MemberService{
             throw new IllegalArgumentException("이미 존재하는 아이디 입니다");
         });
 
-        Member savedMember = memberRepository.save(memberDto.toEntity());
+        Member member = Member.builder()
+                .username(memberDto.getUsername())
+                .password(memberDto.getPassword())
+                .email(memberDto.getEmail())
+                .build();
+
+        Member savedMember = memberRepository.save(member);
         return savedMember.getId();
     }
 
@@ -43,6 +49,28 @@ public class MemberService{
         if (!memberDto.getPassword().equals(member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+    }
+
+
+    /**
+     * 회원 수정
+     */
+
+    @Transactional
+    public Member updateMember(MemberDto memberDto,String username){
+        Member member = memberRepository.getUsername(username);
+
+        if(!memberDto.getPassword().equals(memberDto.getPasswordCheck())){
+            throw new IllegalStateException("비밀번호를 다시 입력해주세요");
+        }
+
+        member.update(memberDto.getPassword(), memberDto.getEmail());
+
+        return memberRepository.save(member);
+    }
+
+    public Member getUsernameForm(String username){
+        return memberRepository.getUsername(username);
     }
 
     /**

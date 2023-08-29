@@ -10,6 +10,7 @@ public class MemberDto {
     private Long id;
     private String username;
     private String password;
+    private String passwordCheck;
     private String email;
 
 
