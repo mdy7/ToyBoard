@@ -8,10 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
-
-/*    @Query("SELECT c from BoardComment c where c.board.id= :id")
-    List<BoardComment> findCommentBoardId(@Param("id") Long id);*/
-
     List<BoardComment> findByBoardId(Long id);
 
 }

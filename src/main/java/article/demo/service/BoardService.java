@@ -2,6 +2,7 @@ package article.demo.service;
 
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
+import article.demo.domain.Member;
 import article.demo.dto.BoardDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
@@ -34,12 +35,18 @@ public class BoardService {
         nullCheckBoard(boardDto);
 
         if (username == null || username.isEmpty()) {
-            boardDto.boardSetting("익명", 1L);
+            boardDto.updateCreateBy("익명", 1L);
         } else {
-            boardDto.boardSetting(username, 1L);
+            Member member = memberRepository.getUsername(username);
+            boardDto.updateCreateBy(member.getUsername(), 1L);
         }
 
-        Board board = boardDto.toEntity();
+        Board board = Board.builder()
+                        .title(boardDto.getTitle())
+                        .content(boardDto.getContent())
+                        .createdBy(boardDto.getCreatedBy())
+                        .countVisit(boardDto.getCountVisit())
+                        .build();
 
         boardRepository.save(board);
     }
@@ -67,8 +74,7 @@ public class BoardService {
     }
 
     public List<Board> myBoarder(String username) {
-        List<Board> userBoards = boardRepository.findByCreatedByOrderByIdDesc(username);
-        return userBoards;
+        return boardRepository.findByCreatedByOrderByIdDesc(username);
     }
 
 
@@ -77,17 +83,15 @@ public class BoardService {
      */
     @Transactional
     public void updateBoard(Long id, BoardDto boardDto, String username) {
-        writerValidation(username,id);
         Board board = boardRepository.getBoard(id);
+        writerValidation(username,id);
         board.updateBoard(boardDto.getTitle(), boardDto.getContent());
         boardRepository.save(board);
     }
 
     public Board updateForm(Long id, String username) {
         Board board = boardRepository.getBoard(id);
-
         writerValidation(username,id);
-
         return board;
     }
 
@@ -106,16 +110,16 @@ public class BoardService {
     }
 
     /**
-     * 게시글 상세
+     * 게시글 조회수
      */
     @Transactional
     public Board updateVisit(Long id) {
         Board board = boardRepository.getBoard(id);
 
-        Long countVisit = board.getCountVisit() + 1L;
+        Long countVisit = board.getCountVisit();
 
         BoardDto boardDto = BoardDto.builder()
-                .countVisit(countVisit)
+                .countVisit(countVisit + 1L)
                 .build();
 
         board.updateVisit(boardDto.getCountVisit());

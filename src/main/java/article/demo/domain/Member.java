@@ -1,7 +1,6 @@
 package article.demo.domain;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -11,6 +10,13 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+/*
+기본 생성자(NoArgsConstructor)의 접근 제어를 PROCTECTED 로 설정하면
+아무런 값도 갖지 않는 의미 없는 객체의 생성 무분별하게 생성하는 것을 막을 수 있다.
+ */
+@AllArgsConstructor
 @Table(name = "member")
 public class Member extends BaseTimeEntity{
 
@@ -30,16 +36,6 @@ public class Member extends BaseTimeEntity{
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Board> board = new ArrayList<>();
-
-    @Builder
-    public Member(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
-
-    public Member() {
-    }
 
 
 }

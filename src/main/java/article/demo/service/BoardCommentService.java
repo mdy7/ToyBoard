@@ -3,11 +3,8 @@ package article.demo.service;
 
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
-import article.demo.domain.BoardCommentReply;
 import article.demo.domain.Member;
 import article.demo.dto.BoardCommentDto;
-import article.demo.dto.BoardCommentReplyDto;
-import article.demo.repository.BoardCommentReplyRepository;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
@@ -29,30 +26,56 @@ public class BoardCommentService {
     private final MemberRepository memberRepository;
 
     /**
-     * 댓글 저장
+     * 댓글 작성
      */
     @Transactional
-    public void saveBoardComment(Long id, BoardCommentDto boardCommentDto,String username) {
+    public void saveBoardCommentParent(Long id, BoardCommentDto boardCommentDto, String username) {
         if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
             throw new IllegalArgumentException("내용을 입력해주세요");
         }
 
         Board board = boardRepository.getBoard(id);
-
         Member member = memberRepository.getUsernameBySession(username);
 
         BoardComment boardComment = BoardComment.builder()
                 .createdBy(member.getUsername())
-                .deleteCheck('N')
+                .deleteCheck(false)
                 .member(member)
                 .board(board)
                 .content(boardCommentDto.getContent())
                 .build();
 
-
         boardCommentRepository.save(boardComment);
     }
 
+
+    /**
+     * 대댓글 작성
+     */
+    @Transactional
+    public void saveBoardCommentChild(Long commentId, BoardCommentDto boardCommentDto, String username,Long boardId) {
+        Board board = boardRepository.getBoard(boardId);
+
+        if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
+            throw new IllegalArgumentException("내용을 입력해주세요");
+        }
+
+        Member member = memberRepository.getUsernameBySession(username);
+
+        BoardComment parentComment = boardCommentRepository.findById(commentId).orElseThrow(() ->
+                new IllegalStateException("부모 댓글이 없습니다"));
+
+        BoardComment boardComment = BoardComment.builder()
+                .createdBy(member.getUsername())
+                .deleteCheck(false)
+                .member(member)
+                .board(board)
+                .parent(parentComment) // 대댓글의 경우 부모 댓글 설정
+                .content(boardCommentDto.getContent())
+                .build();
+
+        boardCommentRepository.save(boardComment);
+    }
 
     /**
      * 댓글 조회
@@ -60,8 +83,6 @@ public class BoardCommentService {
     public List<BoardComment> findCommentBoardId(Long id) {
         return boardCommentRepository.findByBoardId(id);
     }
-
-
 
     /**
      * 댓글 삭제
@@ -71,16 +92,26 @@ public class BoardCommentService {
         BoardComment comment = boardCommentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
 
-        writerValidation(username,comment);
+        memberRepository.getUsernameBySession(username);
+
+        if (!comment.getCreatedBy().equals(username) && !username.equals("admin")) {
+            throw new IllegalStateException("해당 댓글 작성자가 아닙니다.");
+        }
 
         boardCommentRepository.delete(comment);
     }
 
-    public void writerValidation(String username,BoardComment comment) {
+    @Transactional
+    public void deleteReply(Long replyId,String username) {
+        BoardComment reply = boardCommentRepository.findById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("대댓글을 찾을 수 없습니다."));
+
         memberRepository.getUsernameBySession(username);
 
-        if (!comment.getCreatedBy().equals(username) && !username.equals("admin")) {
-            throw new IllegalStateException("댓글 작성자가 아닙니다.");
+        if (!reply.getCreatedBy().equals(username) && !username.equals("admin")) {
+            throw new IllegalStateException("해당 대댓글 작성자가 아닙니다.");
         }
+
+        boardCommentRepository.delete(reply);
     }
 }

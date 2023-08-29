@@ -1,15 +1,17 @@
 package article.demo.domain;
 
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 
 
 @Entity
-@Table(name = "board")
 @Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Table(name = "board")
 public class Board extends BaseTimeEntity{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
@@ -25,14 +27,6 @@ public class Board extends BaseTimeEntity{
     private Member member;
 
 
-    @Builder
-    public Board(String title, String content, String createdBy, Long countVisit) {
-        this.title = title;
-        this.content = content;
-        this.createdBy = createdBy;
-        this.countVisit = countVisit;
-    }
-
     public void updateBoard(String title,String content){
         this.title = title;
         this.content = content;
@@ -40,8 +34,5 @@ public class Board extends BaseTimeEntity{
 
     public void updateVisit(Long countVisit) {
         this.countVisit = countVisit;
-    }
-
-    protected Board() {
     }
 }
