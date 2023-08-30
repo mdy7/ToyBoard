@@ -28,6 +28,7 @@
       <tr>
         <th>번호</th>
         <th>제목</th>
+        <th>추천수</th>
         <th>작성자</th>
         <th>조회수</th>
         <th>날짜</th>
@@ -37,6 +38,7 @@
       <tr th:each="board : ${boards}">
         <td th:text="${board.id}"></td>
         <td><a th:href="@{'/board/boardContent/' + ${board.id}}"><span th:text="${board.title}"></span></a></td>
+        <td th:text="${board.likeCount}"></td>
         <td th:text="${board.createdBy}"></td>
         <td th:text="${board.countVisit}"></td>
         <td th:text="${board.createdDate}"></td>

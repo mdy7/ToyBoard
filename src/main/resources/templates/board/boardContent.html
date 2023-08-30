@@ -35,6 +35,10 @@
     </button>
     <button type="button" class="btn btn-primary" th:if="${board.createdBy eq session.username or session.username eq 'admin'}"
             th:attr="data-board-id=${board.id}" th:onclick="|location.href='/board/boardDelete/' + ${board.id}|">삭제</button>
+    <!-- 좋아요 버튼 -->
+    <button class="btn btn-sm btn-primary float-right" th:attr="data-board-id=${board.id}" th:onclick="|location.href='/board/boardLike/' + ${board.id}|">
+      <span>좋아요</span>
+    </button>
   </div>
   <!-- 댓글 목록 -->
   <div class="card mt-3">
@@ -57,7 +61,6 @@
                       th:attr="data-board-id=${board.id}, data-comment-id=${comment.id}, data-reply-id=${reply.id}" onclick="deleteReply(this)">삭제</button>
             </li>
           </ul>
-          <!-- 대댓글 목록 끝 -->
           <!-- 대댓글 작성 폼 -->
           <div class="reply-form mt-2" style="display: none;">
             <form th:action="@{'/board/addReply/' + ${comment.id}}" method="post">
@@ -72,8 +75,6 @@
       </ul>
     </div>
   </div>
-
-  <!-- 댓글 목록 끝 -->
   <!-- 댓글 작성 -->
   <div class="card mt-3">
     <div class="card-body">
@@ -94,9 +95,7 @@
         location.href = '/board/boardDeleteComment/' + commentId + '?boardId=' + boardId; ; // 실제 삭제 처리 URL로 변경
       }
     }
-  </script>
   <!--  대댓 삭제-->
-  <script>
     function deleteReply(button) {
       const replyId = button.getAttribute('data-reply-id');
       const commentId = button.getAttribute('data-comment-id');
@@ -105,9 +104,7 @@
         location.href = '/board/deleteReply/' + replyId + '?boardId=' + boardId; ; // 실제 삭제 처리 URL로 변경
       }
     }
-  </script>
   <!-- 대댓글 스크립트 -->
-  <script>
     function stopPropagation(event) {
       event.stopPropagation();
     }

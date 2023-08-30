@@ -2,9 +2,11 @@ package article.demo.service;
 
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
+import article.demo.domain.BoardLike;
 import article.demo.domain.Member;
 import article.demo.dto.BoardDto;
 import article.demo.repository.BoardCommentRepository;
+import article.demo.repository.BoardLikeRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,25 +28,24 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final BoardCommentRepository boardCommentRepository;
+    private final BoardLikeRepository boardLikeRepository;
 
     /**
      * 게시글 생성
      */
     @Transactional
     public void saveBoard(BoardDto boardDto, String username) {
+        Member member = memberRepository.getUsername(username);
+        memberRepository.getUsername(username);
         nullCheckBoard(boardDto);
 
-        if (username == null || username.isEmpty()) {
-            boardDto.updateCreateBy("익명", 1L);
-        } else {
-            Member member = memberRepository.getUsername(username);
-            boardDto.updateCreateBy(member.getUsername(), 1L);
-        }
+        boardDto.updateCreateBy(member.getUsername(), 1L);
 
         Board board = Board.builder()
                         .title(boardDto.getTitle())
                         .content(boardDto.getContent())
                         .createdBy(boardDto.getCreatedBy())
+                        .member(member)
                         .countVisit(boardDto.getCountVisit())
                         .build();
 
@@ -126,6 +127,30 @@ public class BoardService {
         return board;
     }
 
+    /**
+     * 좋아요 눌렀을때
+     */
+    @Transactional
+    public void insert(String username,Long boardId) {
+        Member member = memberRepository.getUsername(username);
+        Board board = boardRepository.getBoard(boardId);
+
+        if (boardLikeRepository.findByMemberAndBoard(member, board).isPresent()){
+            throw new IllegalStateException("이미 좋아요를 눌렀습니다");
+        }
+
+        BoardLike boardLike = BoardLike.builder()
+                .member(member)
+                .board(board)
+                .build();
+
+        boardLikeRepository.save(boardLike);
+
+        // 좋아요 수 증가
+        board.updateLike(board.getLikeCount() + 1L);
+        boardRepository.save(board);
+    }
+
 
     /**
      * 검증
@@ -133,7 +158,7 @@ public class BoardService {
     public void writerValidation(String username, Long id) {
         Board board = boardRepository.getBoard(id);
 
-        memberRepository.getUsernameBySession(username);
+        memberRepository.getUsername(username);
 
         if (!board.getCreatedBy().equals(username) && !username.equals("admin")) {
             throw new IllegalStateException("작성자가 아닙니다.");

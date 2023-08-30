@@ -7,7 +7,6 @@ import article.demo.dto.BoardCommentDto;
 import article.demo.dto.BoardDto;
 import article.demo.service.BoardCommentService;
 import article.demo.service.BoardService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,6 +29,7 @@ public class BoardController {
 
     private final BoardService boardService;
     private final BoardCommentService boardCommentService;
+
     @GetMapping("/boardForm")
     public String boardForm() {
         return "board/boardForm";
@@ -93,7 +93,7 @@ public class BoardController {
     }
 
     @GetMapping("/myBoard")
-    public String boardMyBoard(HttpSession session,Model model) {
+    public String MyBoard(HttpSession session,Model model) {
         String username = (String) session.getAttribute("username");
         List<Board> userBoards = boardService.myBoarder(username);
         model.addAttribute("userBoards", userBoards);
@@ -124,16 +124,23 @@ public class BoardController {
     }
 
     @GetMapping("/boardDeleteComment/{id}")
-    public String deleteComment(@PathVariable("id") Long commentId,Long boardId,HttpSession session) {
+    public String commentDelete(@PathVariable("id") Long commentId,Long boardId,HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.deleteCommentById(commentId,username);
         return "redirect:/board/boardContent/" + boardId;
     }
 
     @GetMapping("/deleteReply/{replyId}")
-    public String deleteReply(@PathVariable Long replyId,Long boardId,HttpSession session) {
+    public String replyDelete(@PathVariable Long replyId,Long boardId,HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.deleteReply(replyId,username);
+        return "redirect:/board/boardContent/" + boardId;
+    }
+
+    @GetMapping("/boardLike/{boardId}")
+    public String boardLike(@PathVariable Long boardId, HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        boardService.insert(username,boardId);
         return "redirect:/board/boardContent/" + boardId;
     }
 }

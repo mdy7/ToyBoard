@@ -2,6 +2,7 @@ package article.demo.domain;
 
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -26,6 +27,11 @@ public class Board extends BaseTimeEntity{
     @JoinColumn(name = "member_id") // 외래키 설정
     private Member member;
 
+    @ColumnDefault("0")
+    @Column(name = "like_count", nullable = false)
+    private Long likeCount;
+
+
 
     public void updateBoard(String title,String content){
         this.title = title;
@@ -34,5 +40,9 @@ public class Board extends BaseTimeEntity{
 
     public void updateVisit(Long countVisit) {
         this.countVisit = countVisit;
+    }
+
+    public void updateLike(Long likeCount){
+        this.likeCount = likeCount;
     }
 }

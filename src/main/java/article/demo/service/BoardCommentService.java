@@ -30,12 +30,12 @@ public class BoardCommentService {
      */
     @Transactional
     public void saveBoardCommentParent(Long id, BoardCommentDto boardCommentDto, String username) {
+        Board board = boardRepository.getBoard(id);
+        Member member = memberRepository.getUsername(username);
+
         if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
             throw new IllegalArgumentException("내용을 입력해주세요");
         }
-
-        Board board = boardRepository.getBoard(id);
-        Member member = memberRepository.getUsernameBySession(username);
 
         BoardComment boardComment = BoardComment.builder()
                 .createdBy(member.getUsername())
@@ -56,11 +56,11 @@ public class BoardCommentService {
     public void saveBoardCommentChild(Long commentId, BoardCommentDto boardCommentDto, String username,Long boardId) {
         Board board = boardRepository.getBoard(boardId);
 
+        Member member = memberRepository.getUsername(username);
+
         if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
             throw new IllegalArgumentException("내용을 입력해주세요");
         }
-
-        Member member = memberRepository.getUsernameBySession(username);
 
         BoardComment parentComment = boardCommentRepository.findById(commentId).orElseThrow(() ->
                 new IllegalStateException("부모 댓글이 없습니다"));
@@ -92,7 +92,7 @@ public class BoardCommentService {
         BoardComment comment = boardCommentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
 
-        memberRepository.getUsernameBySession(username);
+        memberRepository.getUsername(username);
 
         if (!comment.getCreatedBy().equals(username) && !username.equals("admin")) {
             throw new IllegalStateException("해당 댓글 작성자가 아닙니다.");
@@ -106,7 +106,7 @@ public class BoardCommentService {
         BoardComment reply = boardCommentRepository.findById(replyId)
                 .orElseThrow(() -> new IllegalArgumentException("대댓글을 찾을 수 없습니다."));
 
-        memberRepository.getUsernameBySession(username);
+        memberRepository.getUsername(username);
 
         if (!reply.getCreatedBy().equals(username) && !username.equals("admin")) {
             throw new IllegalStateException("해당 대댓글 작성자가 아닙니다.");
