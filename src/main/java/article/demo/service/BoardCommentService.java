@@ -27,15 +27,15 @@ public class BoardCommentService {
 
     /**
      * 댓글 작성
+     *
+     * @return
      */
     @Transactional
-    public void saveBoardCommentParent(Long id, BoardCommentDto boardCommentDto, String username) {
+    public BoardComment saveBoardCommentParent(Long id, BoardCommentDto boardCommentDto, String username) {
         Board board = boardRepository.getBoard(id);
-        Member member = memberRepository.getUsername(username);
+        Member member = memberRepository.getMemberByUsername(username);
 
-        if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
-            throw new IllegalArgumentException("내용을 입력해주세요");
-        }
+        nullCheckCommentForm(boardCommentDto, "댓글 내용을 입력해주세요");
 
         BoardComment boardComment = BoardComment.builder()
                 .createdBy(member.getUsername())
@@ -45,22 +45,21 @@ public class BoardCommentService {
                 .content(boardCommentDto.getContent())
                 .build();
 
-        boardCommentRepository.save(boardComment);
+        return boardCommentRepository.save(boardComment);
     }
-
 
     /**
      * 대댓글 작성
+     *
+     * @return
      */
     @Transactional
-    public void saveBoardCommentChild(Long commentId, BoardCommentDto boardCommentDto, String username,Long boardId) {
+    public BoardComment saveBoardCommentChild(Long commentId, BoardCommentDto boardCommentDto, String username, Long boardId) {
         Board board = boardRepository.getBoard(boardId);
 
-        Member member = memberRepository.getUsername(username);
+        Member member = memberRepository.getMemberByUsername(username);
 
-        if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
-            throw new IllegalArgumentException("내용을 입력해주세요");
-        }
+        nullCheckCommentForm(boardCommentDto, "대댓글 내용을 입력해주세요");
 
         BoardComment parentComment = boardCommentRepository.findById(commentId).orElseThrow(() ->
                 new IllegalStateException("부모 댓글이 없습니다"));
@@ -74,7 +73,13 @@ public class BoardCommentService {
                 .content(boardCommentDto.getContent())
                 .build();
 
-        boardCommentRepository.save(boardComment);
+        return boardCommentRepository.save(boardComment);
+    }
+
+    private static void nullCheckCommentForm(BoardCommentDto boardCommentDto, String text) {
+        if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
+            throw new IllegalArgumentException(text);
+        }
     }
 
     /**
@@ -92,7 +97,7 @@ public class BoardCommentService {
         BoardComment comment = boardCommentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
 
-        memberRepository.getUsername(username);
+        memberRepository.getMemberByUsername(username);
 
         if (!comment.getCreatedBy().equals(username) && !username.equals("admin")) {
             throw new IllegalStateException("해당 댓글 작성자가 아닙니다.");
@@ -106,7 +111,7 @@ public class BoardCommentService {
         BoardComment reply = boardCommentRepository.findById(replyId)
                 .orElseThrow(() -> new IllegalArgumentException("대댓글을 찾을 수 없습니다."));
 
-        memberRepository.getUsername(username);
+        memberRepository.getMemberByUsername(username);
 
         if (!reply.getCreatedBy().equals(username) && !username.equals("admin")) {
             throw new IllegalStateException("해당 대댓글 작성자가 아닙니다.");

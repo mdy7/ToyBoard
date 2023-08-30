@@ -22,10 +22,14 @@ public class MemberService{
      */
     @Transactional
     public Long join(MemberDto memberDto) {
-        nullCheckMember(memberDto);
+        nullCheckMemberForm(memberDto);
 
         memberRepository.findByUsername(memberDto.getUsername()).ifPresent( a -> {
-            throw new IllegalArgumentException("이미 존재하는 아이디 입니다");
+            throw new IllegalArgumentException("이미 사용중인 아이디 입니다");
+        });
+
+        memberRepository.findByEmail(memberDto.getEmail()).ifPresent( a -> {
+            throw new IllegalArgumentException("이미 사용중인 이메일 입니다");
         });
 
         Member member = Member.builder()
@@ -42,9 +46,10 @@ public class MemberService{
      * 로그인
      */
     public void login(MemberDto memberDto){
-        nullCheckMember(memberDto);
+        nullCheckMemberForm(memberDto);
 
-        Member member = memberRepository.getUsername(memberDto.getUsername());
+        Member member = memberRepository.findByUsername(memberDto.getUsername()).orElseThrow(() ->
+                new IllegalStateException("존재하지 않는 아이디 입니다"));
 
         if (!memberDto.getPassword().equals(member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
@@ -57,8 +62,8 @@ public class MemberService{
      */
 
     @Transactional
-    public Member updateMember(MemberDto memberDto,String username){
-        Member member = memberRepository.getUsername(username);
+    public Member updateMember(MemberDto memberDto, String username){
+        Member member = memberRepository.getMemberByUsername(username);
 
         if(!memberDto.getPassword().equals(memberDto.getPasswordCheck())){
             throw new IllegalStateException("비밀번호를 다시 입력해주세요");
@@ -70,13 +75,13 @@ public class MemberService{
     }
 
     public Member getUsernameForm(String username){
-        return memberRepository.getUsername(username);
+        return memberRepository.getMemberByUsername(username);
     }
 
     /**
      * 검증
      */
-    private void nullCheckMember(MemberDto memberDto) {
+    private void nullCheckMemberForm(MemberDto memberDto) {
         if (memberDto.getUsername() == null || memberDto.getUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("아이디를 입력해주세요");
         }

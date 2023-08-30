@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +26,12 @@ public class Member extends BaseTimeEntity{
     @Column(name = "member_id")
     private Long id;
 
-    @NotBlank // validation 을 위한 어노테이션
-    @Pattern(regexp = "^[a-zA-Z0-9]{3,12}$", message = "아이디를 3~12자로 입력해주세요. [특수문자 X]")
+    @NotNull(message = "아이디를 입력해주세요.")
+    @Pattern(regexp = "^[a-zA-Z0-9]{3,12}$", message = "아이디를 3~12자로 입력해주세요.")
     private String username;
 
-    @NotBlank(message = "비밀번호를 입력해주세요.")
-    //@Pattern(regexp = "^[a-zA-Z0-9]{3,12}$", message = "비밀번호를 3~12자로 입력해주세요.")
+    @NotNull(message = "비밀번호를 입력해주세요.")
+    @Pattern(regexp = "^[a-zA-Z0-9]{3,12}$", message = "비밀번호를 3~12자로 입력해주세요.")
     private String password;
 
     private String email;

@@ -37,7 +37,7 @@
             th:attr="data-board-id=${board.id}" th:onclick="|location.href='/board/boardDelete/' + ${board.id}|">삭제</button>
     <!-- 좋아요 버튼 -->
     <button class="btn btn-sm btn-primary float-right" th:attr="data-board-id=${board.id}" th:onclick="|location.href='/board/boardLike/' + ${board.id}|">
-      <span>좋아요</span>
+      <span>추천</span>
     </button>
   </div>
   <!-- 댓글 목록 -->
@@ -53,17 +53,17 @@
                   th:attr="data-board-id=${board.id}, data-comment-id=${comment.id}" onclick="deleteComment(this)">삭제</button>
           <!-- 대댓글 목록 -->
           <ul class="list-group list-group-flush mt-2" th:if="${commentRepliesMap.get(comment).size() > 0}">
-            <li class="list-group-item" th:each="reply : ${commentRepliesMap.get(comment)}">
-              - &nbsp;&nbsp;<strong th:text="${reply.getCreatedBy}"></strong>: <span th:text="${reply.content}"></span>
+            <li class="list-group-item" th:each="child : ${commentRepliesMap.get(comment)}">
+              - &nbsp;&nbsp;<strong th:text="${child.getCreatedBy}"></strong>: <span th:text="${child.content}"></span>
               <!-- 대댓글 삭제 버튼 -->
               <button class="btn btn-sm btn-danger float-right"
-                      th:if="${reply.createdBy eq session.username or session.username eq 'admin'}"
-                      th:attr="data-board-id=${board.id}, data-comment-id=${comment.id}, data-reply-id=${reply.id}" onclick="deleteReply(this)">삭제</button>
+                      th:if="${child.createdBy eq session.username or session.username eq 'admin'}"
+                      th:attr="data-board-id=${board.id}, data-comment-id=${comment.id}, data-reply-id=${child.id}" onclick="deleteReply(this)">삭제</button>
             </li>
           </ul>
           <!-- 대댓글 작성 폼 -->
           <div class="reply-form mt-2" style="display: none;">
-            <form th:action="@{'/board/addReply/' + ${comment.id}}" method="post">
+            <form th:action="@{'/board/boardCommentChild/' + ${comment.id}}" method="post">
               <input type="hidden" th:name="boardId" th:value="${board.id}" />
               <input type="hidden" th:name="parentId" th:value="${comment.id}" />
               <textarea class="form-control" rows="2" name="content" placeholder="대댓글을 작성하세요" onclick="stopPropagation(event)"></textarea>
@@ -79,7 +79,7 @@
   <div class="card mt-3">
     <div class="card-body">
       <h5 class="card-title">댓글 작성</h5>
-      <form th:action="@{'/board/boardContent/' + ${board.id}}" method="post">
+      <form th:action="@{'/board/boardCommentParent/' + ${board.id}}" method="post">
         <input type="hidden" th:name="boardId" th:value="${board.id}" />
         <textarea class="form-control" id="content" rows="3" name="content" placeholder="댓글을 작성하세요"></textarea>
         <button type="submit" class="btn btn-dark mt-3">댓글 작성</button>

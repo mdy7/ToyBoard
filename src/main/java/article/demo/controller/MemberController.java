@@ -19,23 +19,23 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/memberJoinForm")
+    @GetMapping("/JoinForm")
     public String createMemberForm(){
         return "member/memberJoinForm";
     }
 
-    @PostMapping("/memberJoinForm")
+    @PostMapping("/JoinForm")
     public String createMember(MemberDto memberDto){
         memberService.join(memberDto);
         return "redirect:/";
     }
 
-    @GetMapping("/memberLoginForm")
+    @GetMapping("/LoginForm")
     public String loginForm(){
         return "member/memberLoginForm";
     }
 
-    @PostMapping("/memberLoginForm")
+    @PostMapping("/LoginForm")
     public String login(HttpSession session,MemberDto memberDto){
         memberService.login(memberDto);
         session.setAttribute("username",memberDto.getUsername());
@@ -43,22 +43,23 @@ public class MemberController {
         return "redirect:/";
     }
 
-    @GetMapping("/memberUpdateForm")
+    @GetMapping("/UpdateForm")
     public String updateForm(HttpSession session, Model model){
         String username = (String) session.getAttribute("username");
         Member member = memberService.getUsernameForm(username);
+
         model.addAttribute("member",member);
         return "member/memberUpdateForm";
     }
 
-    @PostMapping("/memberUpdateForm")
+    @PostMapping("/UpdateForm")
     public String updateMember(MemberDto memberDto,HttpSession session){
         String username = (String) session.getAttribute("username");
         memberService.updateMember(memberDto,username);
         return "redirect:/";
     }
 
-    @GetMapping("/memberLogout")
+    @GetMapping("/Logout")
     public String logout(HttpSession session){
         session.invalidate();
         return "redirect:/";

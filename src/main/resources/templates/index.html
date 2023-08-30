@@ -14,13 +14,13 @@
     <span th:unless="${session.username != null}">회원 기능</span>
     <p>
     <th:block th:unless="${session.username != null}">
-    <a class="btn btn-lg btn-secondary" href="/member/memberJoinForm">회원 가입</a>
+    <a class="btn btn-lg btn-secondary" href="/member/JoinForm">회원 가입</a>
     </th:block>
       <th:block th:if="${session.username != null}">
-        <a class="btn btn-lg btn-secondary" href="/member/memberLogout">로그아웃</a>
+        <a class="btn btn-lg btn-secondary" href="/member/Logout">로그아웃</a>
       </th:block>
       <th:block th:unless="${session.username != null}">
-        <a class="btn btn-lg btn-secondary" href="/member/memberLoginForm">로그인</a>
+        <a class="btn btn-lg btn-secondary" href="/member/LoginForm">로그인</a>
       </th:block>
     </p>
     <p class="lead">게시판</p>
@@ -30,7 +30,7 @@
     </p>
     <p class="lead">마이페이지</p>
     <p>
-      <a class="btn btn-lg btn-info" href="/member/memberUpdateForm">회원 정보</a>
+      <a class="btn btn-lg btn-info" href="/member/UpdateForm">회원 정보</a>
       <a class="btn btn-lg btn-info" href="/board/myBoard">내가 쓴 게시글</a>
     </p>
   </div>

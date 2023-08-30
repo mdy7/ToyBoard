@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    default Member getUsername(String username) {
+    default Member getMemberByUsername(String username) {
         return findByUsername(username).orElseThrow(() ->
                 new IllegalStateException("로그인 정보가 없거나, 존재하지 않는 아이디 입니다."));
     }
@@ -16,5 +16,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByUsername(String username);
     List<Member> findAll();
+
+    Optional<Member> findByEmail(String email);
 
 }

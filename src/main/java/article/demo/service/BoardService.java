@@ -35,8 +35,8 @@ public class BoardService {
      */
     @Transactional
     public void saveBoard(BoardDto boardDto, String username) {
-        Member member = memberRepository.getUsername(username);
-        memberRepository.getUsername(username);
+        Member member = memberRepository.getMemberByUsername(username);
+        memberRepository.getMemberByUsername(username);
         nullCheckBoard(boardDto);
 
         boardDto.updateCreateBy(member.getUsername(), 1L);
@@ -132,11 +132,11 @@ public class BoardService {
      */
     @Transactional
     public void insert(String username,Long boardId) {
-        Member member = memberRepository.getUsername(username);
+        Member member = memberRepository.getMemberByUsername(username);
         Board board = boardRepository.getBoard(boardId);
 
         if (boardLikeRepository.findByMemberAndBoard(member, board).isPresent()){
-            throw new IllegalStateException("이미 좋아요를 눌렀습니다");
+            throw new IllegalStateException("이미 추천한 게시글입니다.");
         }
 
         BoardLike boardLike = BoardLike.builder()
@@ -158,7 +158,7 @@ public class BoardService {
     public void writerValidation(String username, Long id) {
         Board board = boardRepository.getBoard(id);
 
-        memberRepository.getUsername(username);
+        memberRepository.getMemberByUsername(username);
 
         if (!board.getCreatedBy().equals(username) && !username.equals("admin")) {
             throw new IllegalStateException("작성자가 아닙니다.");

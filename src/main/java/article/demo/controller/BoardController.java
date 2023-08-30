@@ -77,23 +77,22 @@ public class BoardController {
         return "/board/boardContent";
     }
 
-    @PostMapping("/boardContent/{id}")
+    @PostMapping("/boardCommentParent/{id}")
     public String addComment(@PathVariable("id") Long id, BoardCommentDto boardCommentDto, HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.saveBoardCommentParent(id, boardCommentDto, username);
         return "redirect:/board/boardContent/" + id;
     }
 
-    @PostMapping("/addReply/{commentId}")
-    public String addReply(@PathVariable Long commentId,Long boardId, BoardCommentDto boardCommentDto,
-                           HttpSession session, Model model) {
+    @PostMapping("/boardCommentChild/{commentId}")
+    public String addReply(@PathVariable Long commentId,Long boardId, BoardCommentDto boardCommentDto, HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.saveBoardCommentChild(commentId, boardCommentDto, username, boardId);
         return "redirect:/board/boardContent/" + boardId;
     }
 
     @GetMapping("/myBoard")
-    public String MyBoard(HttpSession session,Model model) {
+    public String myBoard(HttpSession session,Model model) {
         String username = (String) session.getAttribute("username");
         List<Board> userBoards = boardService.myBoarder(username);
         model.addAttribute("userBoards", userBoards);
@@ -118,7 +117,6 @@ public class BoardController {
     @GetMapping("/boardDelete/{id}")
     public String boardDelete(@PathVariable("id") Long id,HttpSession session) {
         String username = (String) session.getAttribute("username");
-
         boardService.deleteBoard(id,username);
         return "redirect:/board/boardList";
     }
