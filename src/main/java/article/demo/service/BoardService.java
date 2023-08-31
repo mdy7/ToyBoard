@@ -4,7 +4,7 @@ import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
 import article.demo.domain.BoardLike;
 import article.demo.domain.Member;
-import article.demo.dto.BoardDto;
+import article.demo.request.BoardDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardLikeRepository;
 import article.demo.repository.BoardRepository;

@@ -1,16 +1,16 @@
-package article.demo.dto;
+package article.demo.request;
 
 import article.demo.domain.Member;
 import lombok.*;
 
 @Data
 @Builder
-public class MemberDto {
+public class RequestMemberDto {
 
     private Long id;
     private String username;
     private String password;
-    private String passwordCheck;
+    private String passwordConfirm;
     private String email;
 
 

@@ -1,4 +1,4 @@
-package article.demo.dto;
+package article.demo.request;
 
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;

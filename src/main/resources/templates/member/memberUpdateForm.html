@@ -9,7 +9,6 @@
 <body>
 <div class="container">
   <div th:replace="fragments/bodyHeader :: bodyHeader"/>
-  <form role="form" action="/member/UpdateForm" method="post">
     <div class="form-group">
       <label>아이디</label>
       <input type="text" id="username" name="username" class="form-control" placeholder="아이디를 입력하세요" th:value="${member.username}" readonly>
@@ -20,16 +19,41 @@
     </div>
     <div class="form-group">
       <label>비밀번호 확인</label>
-      <input type="password" id="passwordCheck" name="passwordCheck" class="form-control" placeholder="새 비밀번호 확인">
+      <input type="password" id="passwordConfirm" name="passwordConfirm" class="form-control" placeholder="새 비밀번호 확인">
     </div>
     <div class="form-group">
       <label>이메일</label>
       <input type="text" id="email" name="email" class="form-control" placeholder="이메일을 입력하세요" th:value="${member.email}">
     </div>
-    <button type="submit" class="btn btn-primary">회원 수정</button>
-  </form>
+    <button type="submit" id="updateButton" class="btn btn-primary">회원 수정</button>
   <br/>
   <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
+<script>
+  $(document).ready(function() {
+    $("#updateButton").click(function() {
+      const formData = {
+        username: $("#username").val(),
+        password: $("#password").val(),
+        passwordConfirm: $("#passwordConfirm").val(),
+        email: $("#email").val()
+      };
+      $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/member/updateForm",
+        data: JSON.stringify(formData), // 객체를 Json으로 바꿈
+        dataType: "json",
+        success: function(response) {
+          alert(response.data.username + "님 회원정보가 수정되었습니다");
+          window.location.href = "/";
+        },
+        error: function(error) {
+          alert("오류가 발생했습니다.");
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>

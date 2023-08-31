@@ -1,4 +1,4 @@
-package article.demo.dto;
+package article.demo.request;
 
 import lombok.Builder;
 import lombok.Data;

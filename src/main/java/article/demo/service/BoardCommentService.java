@@ -4,7 +4,7 @@ package article.demo.service;
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
 import article.demo.domain.Member;
-import article.demo.dto.BoardCommentDto;
+import article.demo.request.BoardCommentDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;

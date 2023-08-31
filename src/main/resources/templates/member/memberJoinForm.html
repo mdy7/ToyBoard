@@ -9,7 +9,6 @@
 <body>
 <div class="container">
     <div th:replace="fragments/bodyHeader :: bodyHeader"/>
-    <form role="form" action="/member/JoinForm" method="post">
         <div class="form-group">
             <label>아이디</label>
             <input type="text" id="username" name="username" class="form-control" placeholder="아이디를 입력하세요">
@@ -22,10 +21,34 @@
             <label>이메일</label>
             <input type="text" id="email" name="email" class="form-control" placeholder="이메일을 입력하세요">
         </div>
-        <button type="submit" class="btn btn-primary">회원 가입</button>
-    </form>
+        <button type="submit" id="joinButton" class="btn btn-primary">회원 가입</button>
     <br/>
     <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
+<script>
+    $(document).ready(function() {
+        $("#joinButton").click(function() {
+            const formData = {
+                username: $("#username").val(),
+                password: $("#password").val(),
+                email: $("#email").val()
+            };
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/member/joinForm",
+                data: JSON.stringify(formData), // 객체를 Json으로 바꿈
+                dataType: "json",
+                success: function(response) {
+                    alert(response.data.username + "님 가입을 환영합니다");
+                    window.location.href = "/";
+                },
+                error: function(error) {
+                    alert("오류입니다");
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

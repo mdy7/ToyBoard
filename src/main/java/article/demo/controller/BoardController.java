@@ -3,8 +3,8 @@ package article.demo.controller;
 
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
-import article.demo.dto.BoardCommentDto;
-import article.demo.dto.BoardDto;
+import article.demo.request.BoardCommentDto;
+import article.demo.request.BoardDto;
 import article.demo.service.BoardCommentService;
 import article.demo.service.BoardService;
 import lombok.RequiredArgsConstructor;
