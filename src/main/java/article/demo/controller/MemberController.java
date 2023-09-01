@@ -1,9 +1,10 @@
 package article.demo.controller;
 
-import article.demo.domain.Member;
+
 import article.demo.request.MemberRequestDto;
 import article.demo.response.ResponseDto;
 import article.demo.service.MemberService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +19,13 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @ApiOperation(value = "회원가입")
     @PostMapping("/joinForm")
     public ResponseDto<?> createMember(@RequestBody MemberRequestDto memberRequestDto) {
         return memberService.join(memberRequestDto);
     }
 
+    @ApiOperation(value = "로그인")
     @PostMapping("/loginForm")
     public ResponseDto<?> login(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){
         ResponseDto<?> responseDto = memberService.login(memberRequestDto);
@@ -31,6 +34,7 @@ public class MemberController {
         return responseDto;
     }
 
+    @ApiOperation(value = "회원수정")
     @PostMapping("/updateForm")
     public ResponseDto<?> updateMember(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){
         String username = (String) session.getAttribute("username");

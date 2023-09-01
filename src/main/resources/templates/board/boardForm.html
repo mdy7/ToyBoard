@@ -23,5 +23,32 @@
   <br/>
   <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
+<script>
+  $(document).ready(function() {
+    $("#loginButton").click(function() {
+      const formData = {
+        title: $("#title").val(),
+        content: $("#content").val()
+      };
+      $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/board/boardForm",
+        data: JSON.stringify(formData), // 객체를 Json으로 바꿈
+        dataType: "json",
+        success: function(response) {
+          if(response.success) {
+            alert(response.data + "님이 작성한 게시물이 등록 되었습니다");
+            window.location.href = "/";
+          }
+
+        },
+        error: function(error) {
+          alert("오류가 발생했습니다.");
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>

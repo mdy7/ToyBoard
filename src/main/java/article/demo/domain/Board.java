@@ -28,7 +28,7 @@ public class Board extends BaseTimeEntity{
     private Member member;
 
     @ColumnDefault("0")
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count",nullable = false)
     private Long likeCount;
 
 

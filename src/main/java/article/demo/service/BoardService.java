@@ -4,11 +4,13 @@ import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
 import article.demo.domain.BoardLike;
 import article.demo.domain.Member;
-import article.demo.request.BoardDto;
+import article.demo.request.BoardRequestDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardLikeRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
+import article.demo.response.BoardResponseDto;
+import article.demo.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,24 +35,36 @@ public class BoardService {
 
     /**
      * 게시글 생성
+     *
      */
     @Transactional
-    public void saveBoard(BoardDto boardDto, String username) {
+    public ResponseDto<?> saveBoard(BoardRequestDto boardRequestDto, String username) {
         Member member = memberRepository.getMemberByUsername(username);
         memberRepository.getMemberByUsername(username);
-        nullCheckBoard(boardDto);
+        nullCheckBoard(boardRequestDto);
 
-        boardDto.updateCreateBy(member.getUsername(), 1L);
+        boardRequestDto.updateCreateBy(member.getUsername(), 1L,0L,member);
 
         Board board = Board.builder()
-                        .title(boardDto.getTitle())
-                        .content(boardDto.getContent())
-                        .createdBy(boardDto.getCreatedBy())
-                        .member(member)
-                        .countVisit(boardDto.getCountVisit())
+                        .title(boardRequestDto.getTitle())
+                        .content(boardRequestDto.getContent())
+                        .createdBy(boardRequestDto.getCreatedBy())
+                        .member(boardRequestDto.getMember())
+                        .countVisit(boardRequestDto.getCountVisit())
+                        .likeCount(boardRequestDto.getLikeCount())
                         .build();
 
         boardRepository.save(board);
+
+        return ResponseDto.success(
+                "게시글 생성",
+                BoardResponseDto.builder()
+                        .id(board.getId())
+                        .createBy(board.getCreatedBy())
+                        .title(board.getTitle())
+                        .content(board.getContent())
+                        .build()
+        );
     }
 
     /**
@@ -83,10 +98,10 @@ public class BoardService {
      * 게시글 수정
      */
     @Transactional
-    public void updateBoard(Long id, BoardDto boardDto, String username) {
+    public void updateBoard(Long id, BoardRequestDto boardRequestDto, String username) {
         Board board = boardRepository.getBoard(id);
         writerValidation(username,id);
-        board.updateBoard(boardDto.getTitle(), boardDto.getContent());
+        board.updateBoard(boardRequestDto.getTitle(), boardRequestDto.getContent());
         boardRepository.save(board);
     }
 
@@ -119,11 +134,11 @@ public class BoardService {
 
         Long countVisit = board.getCountVisit();
 
-        BoardDto boardDto = BoardDto.builder()
+        BoardRequestDto boardRequestDto = BoardRequestDto.builder()
                 .countVisit(countVisit + 1L)
                 .build();
 
-        board.updateVisit(boardDto.getCountVisit());
+        board.updateVisit(boardRequestDto.getCountVisit());
         return board;
     }
 
@@ -165,12 +180,20 @@ public class BoardService {
         }
     }
 
-    private void nullCheckBoard(BoardDto boardDto) {
-        if (boardDto.getTitle() == null || boardDto.getTitle().isEmpty()) {
+    private void nullCheckBoard(BoardRequestDto boardRequestDto) {
+        if (boardRequestDto.getTitle() == null || boardRequestDto.getTitle().isEmpty()) {
             throw new IllegalArgumentException("제목을 입력해주세요");
         }
-        if (boardDto.getContent() == null || boardDto.getContent().trim().isEmpty()) {
+        if (boardRequestDto.getContent() == null || boardRequestDto.getContent().trim().isEmpty()) {
             throw new IllegalArgumentException("내용을 입력해주세요");
         }
     }
+
+    public List<BoardResponseDto> getBoards() {
+        List<Board> boards = boardRepository.findAll();
+        List<BoardResponseDto> boardDto = new ArrayList<>();
+        boards.forEach(s -> boardDto.add(BoardResponseDto.toDto(s)));
+        return boardDto;
+    }
+
 }

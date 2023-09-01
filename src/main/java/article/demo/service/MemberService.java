@@ -44,6 +44,7 @@ public class MemberService {
         memberRepository.save(member);
 
         return ResponseDto.success(
+                "회원가입 성공",
                 MemberResponseDto.builder()
                         .id(member.getId())
                         .username(member.getUsername())
@@ -76,6 +77,7 @@ public class MemberService {
         }
 
         return ResponseDto.success(
+                "로그인 성공",
                 MemberResponseDto.builder()
                         .id(member.getId())
                         .username(member.getUsername())
@@ -99,6 +101,7 @@ public class MemberService {
         memberRepository.save(member);
 
         return ResponseDto.success(
+                "회원 수정 성공",
                 MemberResponseDto.builder()
                         .id(member.getId())
                         .username(member.getUsername())
