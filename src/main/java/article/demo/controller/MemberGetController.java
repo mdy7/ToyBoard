@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,7 +38,6 @@ public class MemberGetController {
     public String updateForm(HttpSession session, Model model){
         String username = (String) session.getAttribute("username");
         Member member = memberService.getUsernameForm(username);
-
         model.addAttribute("member",member);
         return "member/memberUpdateForm";
     }

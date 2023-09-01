@@ -2,7 +2,7 @@ package article.demo.service;
 
 
 import article.demo.domain.Member;
-import article.demo.request.RequestMemberDto;
+import article.demo.request.MemberRequestDto;
 import article.demo.repository.MemberRepository;
 import article.demo.response.MemberResponseDto;
 import article.demo.response.ResponseDto;
@@ -11,11 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MemberService{
+public class MemberService {
 
     private final MemberRepository memberRepository;
 
@@ -23,21 +26,19 @@ public class MemberService{
      * 회원가입
      */
     @Transactional
-    public ResponseDto<?> join(RequestMemberDto requestMemberDto) {
-        nullCheckMemberForm(requestMemberDto);
+    public ResponseDto<?> join(MemberRequestDto memberRequestDto) {
+        if (null != isPresentUsername(memberRequestDto.getUsername())) {
+            return ResponseDto.fail("DUPLICATED_USERNAME", "이미 사용중인 아이디 입니다.");
+        }
 
-        memberRepository.findByUsername(requestMemberDto.getUsername()).ifPresent(a -> {
-            throw new IllegalArgumentException("이미 사용중인 아이디 입니다");
-        });
-
-        memberRepository.findByEmail(requestMemberDto.getEmail()).ifPresent(a -> {
-            throw new IllegalArgumentException("이미 사용중인 이메일 입니다");
-        });
+        if (null != isPresentEmail(memberRequestDto.getEmail())) {
+            return ResponseDto.fail("DUPLICATED_EMAIL", "이미 사용중인 이메일 입니다.");
+        }
 
         Member member = Member.builder()
-                .username(requestMemberDto.getUsername())
-                .password(requestMemberDto.getPassword())
-                .email(requestMemberDto.getEmail())
+                .username(memberRequestDto.getUsername())
+                .password(memberRequestDto.getPassword())
+                .email(memberRequestDto.getEmail())
                 .build();
 
         memberRepository.save(member);
@@ -50,28 +51,30 @@ public class MemberService{
         );
     }
 
-    private void validateDuplicateUsernameAndEmail(String username, String email) {
-        memberRepository.findByUsername(username).ifPresent(a -> {
-            throw new IllegalArgumentException("이미 사용중인 아이디 입니다");
-        });
+    public Member isPresentUsername(String username) {
+        Optional<Member> findUsername = memberRepository.findByUsername(username);
+        return findUsername.orElse(null);
+    }
 
-        memberRepository.findByEmail(email).ifPresent(a -> {
-            throw new IllegalArgumentException("이미 사용중인 이메일 입니다");
-        });
+    public Member isPresentEmail(String email) {
+        Optional<Member> findEmail = memberRepository.findByEmail(email);
+        return findEmail.orElse(null);
     }
 
     /**
      * 로그인
      */
-    public ResponseDto<?> login(RequestMemberDto requestMemberDto){
-        nullCheckMemberForm(requestMemberDto);
+    public ResponseDto<?> login(MemberRequestDto memberRequestDto) {
+        Member member = isPresentUsername(memberRequestDto.getUsername());
 
-        Member member = memberRepository.findByUsername(requestMemberDto.getUsername()).orElseThrow(() ->
-                new IllegalStateException("존재하지 않는 아이디 입니다"));
-
-        if (!requestMemberDto.getPassword().equals(member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        if (null == member) {
+            return ResponseDto.fail("MEMBER_NOT_FOUNT", "존재하지 않는 아이디 입니다.");
         }
+
+        if (!memberRequestDto.getPassword().equals(member.getPassword())) {
+            return ResponseDto.fail("INVALID_MEMBER", "패스워드가 일치하지 않습니다.");
+        }
+
         return ResponseDto.success(
                 MemberResponseDto.builder()
                         .id(member.getId())
@@ -84,17 +87,14 @@ public class MemberService{
      * 회원 수정
      */
     @Transactional
-    public ResponseDto<?> updateMember(RequestMemberDto requestMemberDto, String username){
+    public ResponseDto<?> updateMember(MemberRequestDto memberRequestDto, String username) {
         Member member = memberRepository.getMemberByUsername(username);
 
-        log.info("Password = {}", requestMemberDto.getPassword());
-        log.info("PasswordConfirm = {}", requestMemberDto.getPasswordConfirm());
-
-        if(!requestMemberDto.getPassword().equals(requestMemberDto.getPasswordConfirm())){
-            throw new IllegalStateException("비밀번호를 다시 입력해주세요");
+        if (!memberRequestDto.getPassword().equals(memberRequestDto.getPasswordConfirm())) {
+            return ResponseDto.fail("PASSWORDS_NOT_MATCHED", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
 
-        member.update(requestMemberDto.getPassword(), requestMemberDto.getEmail());
+        member.update(memberRequestDto.getPassword(), memberRequestDto.getEmail());
 
         memberRepository.save(member);
 
@@ -106,20 +106,21 @@ public class MemberService{
         );
     }
 
-    public Member getUsernameForm(String username){
+
+    public Member getUsernameForm(String username) {
         return memberRepository.getMemberByUsername(username);
     }
 
     /**
      * 검증
      */
-    private void nullCheckMemberForm(RequestMemberDto requestMemberDto) {
-        if (requestMemberDto.getUsername() == null || requestMemberDto.getUsername().trim().isEmpty()) {
-            throw new IllegalArgumentException("아이디를 입력해주세요");
+    private ResponseDto<?> nullCheckMemberForm(MemberRequestDto memberRequestDto) {
+        if (memberRequestDto.getUsername() == null || memberRequestDto.getUsername().trim().isEmpty()) {
+            return ResponseDto.fail("NULL_ID", "아이디를 입력해 주세요");
         }
-        if (requestMemberDto.getPassword() == null || requestMemberDto.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("비밀번호를 입력해주세요");
+        if (memberRequestDto.getPassword() == null || memberRequestDto.getPassword().trim().isEmpty()) {
+            return ResponseDto.fail("NULL_PASSWORD", "패스워드를 입력해 주세요");
         }
+        return null;
     }
 }
-

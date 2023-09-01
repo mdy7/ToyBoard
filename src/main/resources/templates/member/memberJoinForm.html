@@ -40,8 +40,12 @@
                 data: JSON.stringify(formData), // 객체를 Json으로 바꿈
                 dataType: "json",
                 success: function(response) {
-                    alert(response.data.username + "님 가입을 환영합니다");
-                    window.location.href = "/";
+                    if(response.success) {
+                        alert(response.data.username + "님 가입을 환영합니다");
+                        window.location.href = "/";
+                    } else {
+                        alert(response.error.message)
+                    }
                 },
                 error: function(error) {
                     alert("오류입니다");

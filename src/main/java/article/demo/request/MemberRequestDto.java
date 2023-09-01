@@ -5,7 +5,7 @@ import lombok.*;
 
 @Data
 @Builder
-public class RequestMemberDto {
+public class MemberRequestDto {
 
     private Long id;
     private String username;

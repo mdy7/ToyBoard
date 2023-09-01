@@ -10,7 +10,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     default Member getMemberByUsername(String username) {
         return findByUsername(username).orElseThrow(() ->
-                new IllegalStateException("로그인 정보가 없거나, 존재하지 않는 아이디 입니다."));
+                new IllegalStateException("로그인이 필요 합니다"));
     }
 
 
