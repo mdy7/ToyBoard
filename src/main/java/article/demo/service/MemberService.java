@@ -94,6 +94,7 @@ public class MemberService {
 
         if (!memberRequestDto.getPassword().equals(memberRequestDto.getPasswordConfirm())) {
             return ResponseDto.fail("PASSWORDS_NOT_MATCHED", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+//            throw new IllegalStateException("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
 
         member.update(memberRequestDto.getPassword(), memberRequestDto.getEmail());
@@ -119,10 +120,14 @@ public class MemberService {
      */
     private ResponseDto<?> nullCheckMemberForm(MemberRequestDto memberRequestDto) {
         if (memberRequestDto.getUsername() == null || memberRequestDto.getUsername().trim().isEmpty()) {
-            return ResponseDto.fail("NULL_ID", "아이디를 입력해 주세요");
+//            return ResponseDto.fail("NULL_ID", "아이디를 입력해 주세요");
+            throw new IllegalStateException("아이디를 입력해 주세요");
+
         }
         if (memberRequestDto.getPassword() == null || memberRequestDto.getPassword().trim().isEmpty()) {
-            return ResponseDto.fail("NULL_PASSWORD", "패스워드를 입력해 주세요");
+//            return ResponseDto.fail("NULL_PASSWORD", "패스워드를 입력해 주세요");
+            throw new IllegalStateException("패스워드를 입력해 주세요");
+
         }
         return null;
     }

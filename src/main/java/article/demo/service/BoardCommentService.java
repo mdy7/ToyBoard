@@ -8,11 +8,14 @@ import article.demo.request.BoardCommentDto;
 import article.demo.repository.BoardCommentRepository;
 import article.demo.repository.BoardRepository;
 import article.demo.repository.MemberRepository;
+import article.demo.response.BoardCommentResponseDto;
+import article.demo.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,7 +34,7 @@ public class BoardCommentService {
      * @return
      */
     @Transactional
-    public BoardComment saveBoardCommentParent(Long id, BoardCommentDto boardCommentDto, String username) {
+    public ResponseDto<?> saveBoardCommentParent(Long id, BoardCommentDto boardCommentDto, String username) {
         Board board = boardRepository.getBoard(id);
         Member member = memberRepository.getMemberByUsername(username);
 
@@ -45,7 +48,11 @@ public class BoardCommentService {
                 .content(boardCommentDto.getContent())
                 .build();
 
-        return boardCommentRepository.save(boardComment);
+        boardCommentRepository.save(boardComment);
+
+        return ResponseDto.success(
+                "댓글 작성 성공",null
+        );
     }
 
     /**
@@ -78,15 +85,18 @@ public class BoardCommentService {
 
     private static void nullCheckCommentForm(BoardCommentDto boardCommentDto, String text) {
         if (boardCommentDto.getContent() == null || boardCommentDto.getContent().isEmpty()) {
-            throw new IllegalArgumentException(text);
+            throw new IllegalStateException(text);
         }
     }
 
     /**
      * 댓글 조회
      */
-    public List<BoardComment> findCommentBoardId(Long id) {
-        return boardCommentRepository.findByBoardId(id);
+    public ResponseDto<?> getComment(Long id) {
+         List<BoardComment> boardComments = boardCommentRepository.findByBoardId(id);
+         List<BoardCommentResponseDto> commentDto = new ArrayList<>();
+         boardComments.forEach(s -> commentDto.add(BoardCommentResponseDto.toDto(s)));
+         return ResponseDto.success("댓글 조회 성공" ,commentDto);
     }
 
     /**

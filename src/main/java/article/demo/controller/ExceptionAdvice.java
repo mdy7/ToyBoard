@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionAdvice {
     /**
-     * IllegalArgumentException 발생시 이 메소드실행
+     * IllegalStateException 발생시 이 메소드실행
      */
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseDto<?> illegalArgumentExceptionAdvice(IllegalArgumentException e) {
+    public ResponseDto<?> illegalArgumentExceptionAdvice(IllegalStateException e) {
         return ResponseDto.fail( "fail!", e.getMessage().toString());
     }
 }

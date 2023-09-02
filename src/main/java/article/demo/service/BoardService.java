@@ -57,7 +57,7 @@ public class BoardService {
         boardRepository.save(board);
 
         return ResponseDto.success(
-                "게시글 생성",
+                "게시글 생성 성공",
                 BoardResponseDto.builder()
                         .id(board.getId())
                         .createBy(board.getCreatedBy())
@@ -98,16 +98,27 @@ public class BoardService {
      * 게시글 수정
      */
     @Transactional
-    public void updateBoard(Long id, BoardRequestDto boardRequestDto, String username) {
+    public ResponseDto<?> updateBoard(Long id, BoardRequestDto boardRequestDto, String username) {
         Board board = boardRepository.getBoard(id);
-        writerValidation(username,id);
+        validationWriter(username,id);
+
         board.updateBoard(boardRequestDto.getTitle(), boardRequestDto.getContent());
+
         boardRepository.save(board);
+
+        return ResponseDto.success(
+                "게시글 수정 성공",
+                BoardResponseDto.builder()
+                        .id(board.getId())
+                        .title(board.getTitle())
+                        .content(board.getContent())
+                        .build()
+        );
     }
 
     public Board updateForm(Long id, String username) {
         Board board = boardRepository.getBoard(id);
-        writerValidation(username,id);
+        validationWriter(username,id);
         return board;
     }
 
@@ -116,13 +127,15 @@ public class BoardService {
      * 게시글 삭제
      */
     @Transactional
-    public void deleteBoard(Long id, String username) {
-        writerValidation(username,id);
+    public ResponseDto<?> deleteBoard(Long id, String username) {
+        validationWriter(username,id);
 
         List<BoardComment> comments = boardCommentRepository.findByBoardId(id);
         boardCommentRepository.deleteAll(comments); // 댓글 먼저 삭제후 게시글 삭제
 
         boardRepository.deleteById(id);
+
+        return ResponseDto.success("게시글 삭제 성공",null);
     }
 
     /**
@@ -170,22 +183,22 @@ public class BoardService {
     /**
      * 검증
      */
-    public void writerValidation(String username, Long id) {
+    public void validationWriter(String username, Long id) {
         Board board = boardRepository.getBoard(id);
 
         memberRepository.getMemberByUsername(username);
 
-        if (!board.getCreatedBy().equals(username) && !username.equals("admin")) {
+        if (!board.getCreatedBy().equals(username)) {
             throw new IllegalStateException("작성자가 아닙니다.");
         }
     }
 
     private void nullCheckBoard(BoardRequestDto boardRequestDto) {
         if (boardRequestDto.getTitle() == null || boardRequestDto.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("제목을 입력해주세요");
+            throw new IllegalStateException("제목을 입력해주세요");
         }
         if (boardRequestDto.getContent() == null || boardRequestDto.getContent().trim().isEmpty()) {
-            throw new IllegalArgumentException("내용을 입력해주세요");
+            throw new IllegalStateException("내용을 입력해주세요");
         }
     }
 

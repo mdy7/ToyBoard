@@ -3,8 +3,6 @@ package article.demo.controller;
 
 import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
-import article.demo.request.BoardCommentDto;
-import article.demo.request.BoardRequestDto;
 import article.demo.service.BoardCommentService;
 import article.demo.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -53,10 +51,10 @@ public class BoardGetController {
         return "board/boardList";
     }
 
-    @GetMapping("/boardContent/{id}")
+/*    @GetMapping("/boardContent/{id}")
     public String boardContent(@PathVariable("id") Long id, Model model) {
         Board board = boardService.updateVisit(id);
-        List<BoardComment> comments = boardCommentService.findCommentBoardId(id);
+        List<BoardComment> comments = boardCommentService.getComment(id);
 
         // 댓글별로 대댓글 조회
         Map<BoardComment, List<BoardComment>> commentRepliesMap = new HashMap<>();
@@ -69,21 +67,21 @@ public class BoardGetController {
         model.addAttribute("comments",comments);
         model.addAttribute(board);
         return "/board/boardContent";
-    }
+    }*/
 
-    @PostMapping("/boardCommentParent/{id}")
+/*    @PostMapping("/boardCommentParent/{id}")
     public String addComment(@PathVariable("id") Long id, BoardCommentDto boardCommentDto, HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.saveBoardCommentParent(id, boardCommentDto, username);
         return "redirect:/board/boardContent/" + id;
-    }
+    }*/
 
-    @PostMapping("/boardCommentChild/{commentId}")
+/*    @PostMapping("/boardCommentChild/{commentId}")
     public String addReply(@PathVariable Long commentId,Long boardId, BoardCommentDto boardCommentDto, HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.saveBoardCommentChild(commentId, boardCommentDto, username, boardId);
         return "redirect:/board/boardContent/" + boardId;
-    }
+    }*/
 
     @GetMapping("/myBoard")
     public String myBoard(HttpSession session,Model model) {
@@ -101,19 +99,19 @@ public class BoardGetController {
         return "board/boardUpdate";
     }
 
-    @PostMapping("/boardUpdate/{id}")
+/*    @PostMapping("/boardUpdate/{id}")
     public String boardUpdate(@PathVariable("id") Long id, BoardRequestDto boardRequestDto, HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardService.updateBoard(id, boardRequestDto,username);
         return "redirect:/board/boardContent/" + id;
-    }
+    }*/
 
-    @GetMapping("/boardDelete/{id}")
+/*    @GetMapping("/boardDelete/{id}")
     public String boardDelete(@PathVariable("id") Long id,HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardService.deleteBoard(id,username);
         return "redirect:/board/boardList";
-    }
+    }*/
 
     @GetMapping("/boardDeleteComment/{id}")
     public String commentDelete(@PathVariable("id") Long commentId,Long boardId,HttpSession session) {
