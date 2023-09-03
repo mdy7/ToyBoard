@@ -16,34 +16,34 @@ import javax.servlet.http.HttpSession;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/board")
+@RequestMapping("/boards")
 public class BoardController {
     private final BoardService boardService;
     private final BoardCommentService boardCommentService;
 
     @ApiOperation(value = "게시글 작성")
-    @PostMapping("/write")
-    public ResponseDto<?> boardForm(HttpSession session,@RequestBody BoardRequestDto boardRequestDto){
+    @PostMapping
+    public ResponseDto<?> boardWrite(HttpSession session,@RequestBody BoardRequestDto boardRequestDto){
         String username = (String)session.getAttribute("username");
         ResponseDto<?> responseDto = boardService.saveBoard(boardRequestDto, username);
         return responseDto;
     }
 
     @ApiOperation(value = "게시글 전체 조회")
-    @GetMapping("/boards")
+    @GetMapping
     public ResponseDto<?> getBoards() {
-        return ResponseDto.success("게시물 전체 조회",boardService.getBoards());
+        return boardService.getBoards();
     }
 
-    @ApiOperation(value = "게시글 업데이트")
-    @PostMapping("/{boardId}/update")
+    @ApiOperation(value = "게시글 수정")
+    @PatchMapping("/{boardId}")
     public ResponseDto<?> boardUpdate(@PathVariable("boardId") Long boardId, @RequestBody BoardRequestDto boardRequestDto, HttpSession session) {
         String username = (String) session.getAttribute("username");
         return boardService.updateBoard(boardId, boardRequestDto, username);
     }
 
     @ApiOperation(value = "게시글 삭제")
-    @GetMapping("/{boardId}/delete")
+    @DeleteMapping("/{boardId}")
     public ResponseDto<?> boardDelete(@PathVariable("boardId") Long boardId,HttpSession session) {
         String username = (String) session.getAttribute("username");
         return boardService.deleteBoard(boardId,username);
@@ -57,10 +57,16 @@ public class BoardController {
     }
 
     @ApiOperation(value = "게시글 댓글 조회")
-    @GetMapping("/{boardId}/comments")
+    @GetMapping("/{boardId}/comment")
     public ResponseDto<?> boardComments(@PathVariable("boardId") Long boardId){
         return boardCommentService.getComments(boardId);
     }
 
+    @ApiOperation(value = "게시글 댓글 삭제")
+    @DeleteMapping("/{boardId}/comment/{commentId}")
+    public ResponseDto<?> commentDelete(@PathVariable("commentId") Long commentId, @PathVariable String boardId, HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        return boardCommentService.deleteCommentById(commentId,username);
+    }
 
 }

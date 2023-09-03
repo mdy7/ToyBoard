@@ -113,19 +113,19 @@ public class BoardGetController {
         return "redirect:/board/boardList";
     }*/
 
-    @GetMapping("/boardDeleteComment/{id}")
+/*    @GetMapping("/boardDeleteComment/{id}")
     public String commentDelete(@PathVariable("id") Long commentId,Long boardId,HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.deleteCommentById(commentId,username);
         return "redirect:/board/boardContent/" + boardId;
-    }
+    }*/
 
-    @GetMapping("/deleteReply/{replyId}")
+/*    @GetMapping("/deleteReply/{replyId}")
     public String replyDelete(@PathVariable Long replyId,Long boardId,HttpSession session) {
         String username = (String) session.getAttribute("username");
         boardCommentService.deleteReply(replyId,username);
         return "redirect:/board/boardContent/" + boardId;
-    }
+    }*/
 
     @GetMapping("/boardLike/{boardId}")
     public String boardLike(@PathVariable Long boardId, HttpSession session) {

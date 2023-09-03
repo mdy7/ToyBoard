@@ -94,7 +94,6 @@ public class MemberService {
 
         if (!memberRequestDto.getPassword().equals(memberRequestDto.getPasswordConfirm())) {
             return ResponseDto.fail("PASSWORDS_NOT_MATCHED", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-//            throw new IllegalStateException("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
 
         member.update(memberRequestDto.getPassword(), memberRequestDto.getEmail());

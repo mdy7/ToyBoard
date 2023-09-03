@@ -78,33 +78,6 @@ public class BoardCommentService {
         }
     }
 
-
-    /**
-     * 대댓글 작성
-     */
-    @Transactional
-    public BoardComment saveBoardCommentChild(Long commentId, BoardCommentRequestDto boardCommentRequestDto, String username, Long boardId) {
-        Board board = boardRepository.getBoard(boardId);
-
-        Member member = memberRepository.getMemberByUsername(username);
-
-        nullCheckCommentForm(boardCommentRequestDto, "대댓글 내용을 입력해주세요");
-
-        BoardComment parentComment = boardCommentRepository.findById(commentId).orElseThrow(() ->
-                new IllegalStateException("부모 댓글이 없습니다"));
-
-        BoardComment boardComment = BoardComment.builder()
-                .createdBy(member.getUsername())
-                .deleteCheck(false)
-                .member(member)
-                .board(board)
-                .parent(parentComment) // 대댓글의 경우 부모 댓글 설정
-                .content(boardCommentRequestDto.getContent())
-                .build();
-
-        return boardCommentRepository.save(boardComment);
-    }
-
     private static void nullCheckCommentForm(BoardCommentRequestDto boardCommentRequestDto, String message) {
         if (boardCommentRequestDto.getContent() == null || boardCommentRequestDto.getContent().isEmpty()) {
             throw new IllegalStateException(message);
@@ -117,13 +90,13 @@ public class BoardCommentService {
     public ResponseDto<?> getComments(Long boardId) {
         boardRepository.getBoard(boardId);
         List<BoardComment> boardComments = boardCommentRepository.findByBoardId(boardId);
-        List<BoardCommentResponseDto> boardCommentResponseDos = new ArrayList<>();
+        List<BoardCommentResponseDto> boardCommentResponseDto = new ArrayList<>();
 
         for (BoardComment s : boardComments) {
             BoardCommentResponseDto dto = BoardCommentResponseDto.toDto(s);
-            boardCommentResponseDos.add(dto); //
+            boardCommentResponseDto.add(dto); //
         }
-        return ResponseDto.success("댓글 조회 성공" ,boardCommentResponseDos);
+        return ResponseDto.success("댓글 조회 성공" ,boardCommentResponseDto);
     }
 
 
@@ -131,30 +104,17 @@ public class BoardCommentService {
      * 댓글 삭제
      */
     @Transactional
-    public void deleteCommentById(Long commentId,String username) {
+    public ResponseDto<?> deleteCommentById(Long commentId,String username) {
         BoardComment comment = boardCommentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalStateException("해당 댓글이 존재하지 않습니다."));
 
         memberRepository.getMemberByUsername(username);
 
-        if (!comment.getCreatedBy().equals(username) && !username.equals("admin")) {
+        if (!comment.getCreatedBy().equals(username)) {
             throw new IllegalStateException("해당 댓글 작성자가 아닙니다.");
         }
 
         boardCommentRepository.delete(comment);
-    }
-
-    @Transactional
-    public void deleteReply(Long replyId,String username) {
-        BoardComment reply = boardCommentRepository.findById(replyId)
-                .orElseThrow(() -> new IllegalArgumentException("대댓글을 찾을 수 없습니다."));
-
-        memberRepository.getMemberByUsername(username);
-
-        if (!reply.getCreatedBy().equals(username) && !username.equals("admin")) {
-            throw new IllegalStateException("해당 대댓글 작성자가 아닙니다.");
-        }
-
-        boardCommentRepository.delete(reply);
+        return ResponseDto.success("댓글 삭제 성공",null);
     }
 }

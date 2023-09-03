@@ -35,7 +35,6 @@ public class BoardService {
 
     /**
      * 게시글 생성
-     *
      */
     @Transactional
     public ResponseDto<?> saveBoard(BoardRequestDto boardRequestDto, String username) {
@@ -89,11 +88,12 @@ public class BoardService {
         return boards;
     }
 
-    public List<BoardResponseDto> getBoards() {
+    public ResponseDto<?> getBoards() {
         List<Board> boards = boardRepository.findAll();
         List<BoardResponseDto> boardDto = new ArrayList<>();
         boards.forEach(s -> boardDto.add(BoardResponseDto.toDto(s)));
-        return boardDto;
+        return ResponseDto.success("게시물 전체 조회",boardDto);
+
     }
 
     public List<Board> myBoarder(String username) {

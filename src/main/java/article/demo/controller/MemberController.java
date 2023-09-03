@@ -14,23 +14,27 @@ import javax.servlet.http.HttpSession;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/member")
+@RequestMapping("/members")
 public class MemberController {
 
     private final MemberService memberService;
 
     @ApiOperation(value = "회원가입")
-    @PostMapping("/join")
+    @PostMapping
     public ResponseDto<?> createMember(@RequestBody MemberRequestDto memberRequestDto) {
         return memberService.join(memberRequestDto);
     }
 
+    // 회원조회 구현
+
     @ApiOperation(value = "회원수정")
-    @PostMapping("/update")
+    @PatchMapping
     public ResponseDto<?> updateMember(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){
         String username = (String) session.getAttribute("username");
         return memberService.updateMember(memberRequestDto,username);
     }
+
+    // 회원삭제 구현
 
     @ApiOperation(value = "로그인")
     @PostMapping("/login")
