@@ -25,7 +25,11 @@ public class MemberController {
         return memberService.join(memberRequestDto);
     }
 
-    // 회원조회 구현
+    @ApiOperation(value = "회원 전체 조회")
+    @GetMapping
+    public ResponseDto<?> memberList() {
+        return memberService.memberList();
+    }
 
     @ApiOperation(value = "회원수정")
     @PatchMapping
@@ -34,7 +38,11 @@ public class MemberController {
         return memberService.updateMember(memberRequestDto,username);
     }
 
-    // 회원삭제 구현
+    @ApiOperation(value = "회원 삭제")
+    @DeleteMapping("/{memberId}")
+    public ResponseDto<?> deleteMember(@PathVariable Long memberId,HttpSession session) {
+        return memberService.deleteMember(memberId);
+    }
 
     @ApiOperation(value = "로그인")
     @PostMapping("/login")

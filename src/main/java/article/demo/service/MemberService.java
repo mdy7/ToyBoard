@@ -86,6 +86,13 @@ public class MemberService {
     }
 
     /**
+     * 회원 전체 조회
+     */
+    public ResponseDto<?> memberList() {
+        return ResponseDto.success("전체 회원 조회",memberRepository.findAll());
+    }
+
+    /**
      * 회원 수정
      */
     @Transactional
@@ -110,6 +117,20 @@ public class MemberService {
     }
 
 
+    /**
+     * 회원 삭제
+     */
+    @Transactional
+    public ResponseDto<?> deleteMember(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new IllegalStateException("없는 아이디 입니다"));
+
+        memberRepository.delete(member);
+
+        return ResponseDto.success("회원 삭제 성공",null);
+    }
+
+
     public Member getUsernameForm(String username) {
         return memberRepository.getMemberByUsername(username);
     }
@@ -130,4 +151,6 @@ public class MemberService {
         }
         return null;
     }
+
+
 }
