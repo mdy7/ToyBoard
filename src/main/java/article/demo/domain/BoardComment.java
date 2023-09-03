@@ -26,21 +26,17 @@ public class BoardComment extends BaseTimeEntity{
     private String createdBy;
     private Boolean deleteCheck;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private BoardComment parent; // 부모댓글 null일 경우 최상위 댓글
-
-    @Builder.Default
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
-    private List<BoardComment> children = new ArrayList<>(); // 자식댓글
+    private BoardComment parent;
 
     public void updateDelete(Boolean deleteCheck) {
         this.deleteCheck = deleteCheck;

@@ -20,13 +20,20 @@ public class MemberController {
     private final MemberService memberService;
 
     @ApiOperation(value = "회원가입")
-    @PostMapping("/joinForm")
+    @PostMapping("/join")
     public ResponseDto<?> createMember(@RequestBody MemberRequestDto memberRequestDto) {
         return memberService.join(memberRequestDto);
     }
 
+    @ApiOperation(value = "회원수정")
+    @PostMapping("/update")
+    public ResponseDto<?> updateMember(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){
+        String username = (String) session.getAttribute("username");
+        return memberService.updateMember(memberRequestDto,username);
+    }
+
     @ApiOperation(value = "로그인")
-    @PostMapping("/loginForm")
+    @PostMapping("/login")
     public ResponseDto<?> login(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){
         ResponseDto<?> responseDto = memberService.login(memberRequestDto);
         session.setAttribute("username", memberRequestDto.getUsername());
@@ -34,10 +41,4 @@ public class MemberController {
         return responseDto;
     }
 
-    @ApiOperation(value = "회원수정")
-    @PostMapping("/updateForm")
-    public ResponseDto<?> updateMember(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){
-        String username = (String) session.getAttribute("username");
-        return memberService.updateMember(memberRequestDto,username);
-    }
 }

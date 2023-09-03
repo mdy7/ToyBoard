@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
     List<BoardComment> findByBoardId(Long id);
+    }
 
-}

@@ -89,6 +89,13 @@ public class BoardService {
         return boards;
     }
 
+    public List<BoardResponseDto> getBoards() {
+        List<Board> boards = boardRepository.findAll();
+        List<BoardResponseDto> boardDto = new ArrayList<>();
+        boards.forEach(s -> boardDto.add(BoardResponseDto.toDto(s)));
+        return boardDto;
+    }
+
     public List<Board> myBoarder(String username) {
         return boardRepository.findByCreatedByOrderByIdDesc(username);
     }
@@ -98,9 +105,9 @@ public class BoardService {
      * 게시글 수정
      */
     @Transactional
-    public ResponseDto<?> updateBoard(Long id, BoardRequestDto boardRequestDto, String username) {
-        Board board = boardRepository.getBoard(id);
-        validationWriter(username,id);
+    public ResponseDto<?> updateBoard(Long boardId, BoardRequestDto boardRequestDto, String username) {
+        Board board = boardRepository.getBoard(boardId);
+        validationWriter(username,boardId);
 
         board.updateBoard(boardRequestDto.getTitle(), boardRequestDto.getContent());
 
@@ -127,13 +134,13 @@ public class BoardService {
      * 게시글 삭제
      */
     @Transactional
-    public ResponseDto<?> deleteBoard(Long id, String username) {
-        validationWriter(username,id);
+    public ResponseDto<?> deleteBoard(Long boardId, String username) {
+        validationWriter(username,boardId);
 
-        List<BoardComment> comments = boardCommentRepository.findByBoardId(id);
+        List<BoardComment> comments = boardCommentRepository.findByBoardId(boardId);
         boardCommentRepository.deleteAll(comments); // 댓글 먼저 삭제후 게시글 삭제
 
-        boardRepository.deleteById(id);
+        boardRepository.deleteById(boardId);
 
         return ResponseDto.success("게시글 삭제 성공",null);
     }
@@ -200,13 +207,6 @@ public class BoardService {
         if (boardRequestDto.getContent() == null || boardRequestDto.getContent().trim().isEmpty()) {
             throw new IllegalStateException("내용을 입력해주세요");
         }
-    }
-
-    public List<BoardResponseDto> getBoards() {
-        List<Board> boards = boardRepository.findAll();
-        List<BoardResponseDto> boardDto = new ArrayList<>();
-        boards.forEach(s -> boardDto.add(BoardResponseDto.toDto(s)));
-        return boardDto;
     }
 
 }
