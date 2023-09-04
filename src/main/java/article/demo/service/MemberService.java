@@ -1,9 +1,11 @@
 package article.demo.service;
 
 
+import article.demo.domain.Board;
 import article.demo.domain.Member;
 import article.demo.request.MemberRequestDto;
 import article.demo.repository.MemberRepository;
+import article.demo.response.BoardResponseDto;
 import article.demo.response.MemberResponseDto;
 import article.demo.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,8 +92,20 @@ public class MemberService {
      * 회원 전체 조회
      */
     public ResponseDto<?> memberList() {
-        return ResponseDto.success("전체 회원 조회",memberRepository.findAll());
+        List<Member> members = memberRepository.findAll();
+        List<MemberResponseDto> memberResponseDto = new ArrayList<>();
+
+        for (Member member : members) {
+            MemberResponseDto dto = MemberResponseDto.builder()
+                    .id(member.getId())
+                    .username(member.getUsername())
+                    .email(member.getEmail())
+                    .build();
+            memberResponseDto.add(dto);
+        }
+        return ResponseDto.success("전체 회원 조회", memberResponseDto);
     }
+
 
     /**
      * 회원 수정
