@@ -34,7 +34,7 @@ public class BoardGetController {
     }
 
 
-    @GetMapping("/boardList")
+/*    @GetMapping("/boardList")
     public String boardList(Model model,
                             @RequestParam(required = false, defaultValue = "") String searchText,
                             @RequestParam(required = false, defaultValue = "") String searchType,
@@ -49,7 +49,7 @@ public class BoardGetController {
         model.addAttribute("endPage", endPage);
         model.addAttribute("boards", boards);
         return "board/boardList";
-    }
+    }*/
 
 /*    @GetMapping("/boardContent/{id}")
     public String boardContent(@PathVariable("id") Long id, Model model) {
@@ -127,10 +127,10 @@ public class BoardGetController {
         return "redirect:/board/boardContent/" + boardId;
     }*/
 
-    @GetMapping("/boardLike/{boardId}")
-    public String boardLike(@PathVariable Long boardId, HttpSession session) {
-        String username = (String) session.getAttribute("username");
-        boardService.insert(username,boardId);
-        return "redirect:/board/boardContent/" + boardId;
-    }
+//    @GetMapping("/boardLike/{boardId}")
+//    public String boardLike(@PathVariable Long boardId, HttpSession session) {
+//        String username = (String) session.getAttribute("username");
+//        boardService.insert(username,boardId);
+//        return "redirect:/board/boardContent/" + boardId;
+//    }
 }

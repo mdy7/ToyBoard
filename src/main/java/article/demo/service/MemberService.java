@@ -106,6 +106,18 @@ public class MemberService {
         return ResponseDto.success("전체 회원 조회", memberResponseDto);
     }
 
+    public ResponseDto<?> memberDetail(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new IllegalStateException("존재하지 않는 아이디 입니다"));
+
+        return ResponseDto.success("회원 상세 조회",
+                MemberResponseDto.builder()
+                        .id(member.getId())
+                        .username(member.getUsername())
+                        .email(member.getEmail())
+                        .build()
+        );
+    }
 
     /**
      * 회원 수정
@@ -166,6 +178,4 @@ public class MemberService {
         }
         return null;
     }
-
-
 }

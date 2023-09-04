@@ -15,6 +15,6 @@ public class ExceptionAdvice {
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseDto<?> illegalArgumentExceptionAdvice(IllegalStateException e) {
-        return ResponseDto.fail( "fail!", e.getMessage().toString());
+        return ResponseDto.fail( "실패!", e.getMessage().toString());
     }
 }

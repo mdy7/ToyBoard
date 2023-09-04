@@ -23,7 +23,6 @@ public class BoardResponseDto {
     private Long likeCount;
     private LocalDateTime createdDate;
 
-
     public static BoardResponseDto toDto(Board board) {
         return new BoardResponseDto(
                 board.getId(),

@@ -1,19 +1,14 @@
 package article.demo.response;
 
 
-import article.demo.domain.Board;
 import article.demo.domain.BoardComment;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
+
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Setter
 @Builder
 public class BoardCommentResponseDto {
 
@@ -22,6 +17,7 @@ public class BoardCommentResponseDto {
     private Long id;
     private String content;
     private String createdBy;
+    //private List<BoardComment> children;
 
 
     public static BoardCommentResponseDto toDto(BoardComment boardComment) {
@@ -31,6 +27,16 @@ public class BoardCommentResponseDto {
                 .id(boardComment.getId())
                 .content(boardComment.getContent())
                 .createdBy(boardComment.getMember().getUsername())
+                //.children(boardComment.getChildren())
                 .build();
+    }
+
+    @Getter
+    @Setter
+    public static class Children {
+        private Long id;
+        private Long parentId;
+        private String content;
+        private String createdBy;
     }
 }

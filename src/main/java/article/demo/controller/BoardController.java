@@ -1,6 +1,7 @@
 package article.demo.controller;
 
 
+import article.demo.domain.Board;
 import article.demo.request.BoardCommentRequestDto;
 import article.demo.request.BoardRequestDto;
 import article.demo.response.ResponseDto;
@@ -9,6 +10,11 @@ import article.demo.service.BoardService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -33,6 +39,12 @@ public class BoardController {
     @GetMapping
     public ResponseDto<?> getBoards() {
         return boardService.getBoards();
+    }
+
+    @ApiOperation(value = "게시글 상세 조회")
+    @GetMapping("/{boardId}")
+    public ResponseDto<?> boardDetail(@PathVariable Long boardId){
+        return boardService.boardDetail(boardId);
     }
 
     @ApiOperation(value = "게시글 수정")
@@ -69,4 +81,28 @@ public class BoardController {
         return boardCommentService.deleteCommentById(commentId,username);
     }
 
+    @ApiOperation(value = "게시글 좋아요")
+    @GetMapping("/{boardId}/boardLike")
+    public ResponseDto<?> boardLike(@PathVariable Long boardId, HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        return boardService.insertLike(username,boardId);
+    }
+
+    @ApiOperation(value = "게시글 ")
+    @GetMapping("/boardList")
+    public String boardList(Model model,
+                            @RequestParam(required = false, defaultValue = "") String searchText,
+                            @RequestParam(required = false, defaultValue = "") String searchType,
+                            @PageableDefault(page = 0, size = 10,sort = "id",direction = Sort.Direction.DESC)
+                            Pageable pageable) {
+        Page<Board> boards = boardService.searchBoard(searchText,searchType,pageable);
+
+        int startPage = Math.max(1, boards.getPageable().getPageNumber() - 1);
+        int endPage = Math.min(boards.getTotalPages(), boards.getPageable().getPageNumber() + 3);
+
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("boards", boards);
+        return "board/boardList";
+    }
 }

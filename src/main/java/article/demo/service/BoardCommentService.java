@@ -57,9 +57,10 @@ public class BoardCommentService {
                     BoardCommentResponseDto.toDto(boardComment)
             );
         } else {
+            // 자식 댓글 작성
             BoardComment parentComment = boardCommentRepository.findById(boardCommentRequestDto.getParent().getId()).orElseThrow(() ->
                     new IllegalStateException("부모 댓글이 없습니다"));
-            //자식댓글
+
             BoardComment boardComment = BoardComment.builder()
                     .createdBy(member.getUsername())
                     .deleteCheck(false)
@@ -92,9 +93,9 @@ public class BoardCommentService {
         List<BoardComment> boardComments = boardCommentRepository.findByBoardId(boardId);
         List<BoardCommentResponseDto> boardCommentResponseDto = new ArrayList<>();
 
-        for (BoardComment s : boardComments) {
-            BoardCommentResponseDto dto = BoardCommentResponseDto.toDto(s);
-            boardCommentResponseDto.add(dto); //
+        for (BoardComment boardComment : boardComments) {
+            BoardCommentResponseDto dto = BoardCommentResponseDto.toDto(boardComment);
+            boardCommentResponseDto.add(dto);
         }
         return ResponseDto.success("댓글 조회 성공" ,boardCommentResponseDto);
     }

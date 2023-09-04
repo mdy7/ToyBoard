@@ -1,5 +1,9 @@
 package article.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -38,7 +42,6 @@ public class BoardComment extends BaseTimeEntity{
     @JoinColumn(name = "parent_id")
     private BoardComment parent;
 
-    public void updateDelete(Boolean deleteCheck) {
-        this.deleteCheck = deleteCheck;
-    }
+    @OneToMany(mappedBy = "parent", orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<BoardComment> children = new ArrayList<>();
 }

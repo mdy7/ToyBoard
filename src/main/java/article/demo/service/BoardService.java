@@ -93,7 +93,6 @@ public class BoardService {
         List<BoardResponseDto> boardDto = new ArrayList<>();
         boards.forEach(s -> boardDto.add(BoardResponseDto.toDto(s)));
         return ResponseDto.success("게시물 전체 조회",boardDto);
-
     }
 
     public List<Board> myBoarder(String username) {
@@ -162,16 +161,33 @@ public class BoardService {
         return board;
     }
 
+    @Transactional
+    public ResponseDto<?> boardDetail(Long boardId) {
+        Board board = boardRepository.getBoard(boardId);
+
+        // 조회수 증가
+        Long countVisit = board.getCountVisit();
+
+        BoardRequestDto boardRequestDto = BoardRequestDto.builder()
+                .countVisit(countVisit + 1L)
+                .build();
+
+        board.updateVisit(boardRequestDto.getCountVisit());
+
+        return ResponseDto.success("게시글 상세 조회",BoardResponseDto.toDto(board)
+        );
+    }
+
     /**
      * 좋아요 눌렀을때
      */
     @Transactional
-    public void insert(String username,Long boardId) {
+    public ResponseDto<?> insertLike(String username, Long boardId) {
         Member member = memberRepository.getMemberByUsername(username);
         Board board = boardRepository.getBoard(boardId);
 
         if (boardLikeRepository.findByMemberAndBoard(member, board).isPresent()){
-            throw new IllegalStateException("이미 추천한 게시글입니다.");
+            throw new IllegalStateException("이미 좋아요 누른 게시글입니다.");
         }
 
         BoardLike boardLike = BoardLike.builder()
@@ -184,6 +200,8 @@ public class BoardService {
         // 좋아요 수 증가
         board.updateLike(board.getLikeCount() + 1L);
         boardRepository.save(board);
+
+        return ResponseDto.success("좋아요 성공",null);
     }
 
 
@@ -208,5 +226,4 @@ public class BoardService {
             throw new IllegalStateException("내용을 입력해주세요");
         }
     }
-
 }

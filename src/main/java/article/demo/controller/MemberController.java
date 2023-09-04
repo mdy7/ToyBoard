@@ -31,6 +31,12 @@ public class MemberController {
         return memberService.memberList();
     }
 
+    @ApiOperation(value = "회원 상세 조회")
+    @GetMapping("/{memberId}")
+    public ResponseDto<?> memberDetail(@PathVariable Long memberId) {
+        return memberService.memberDetail(memberId);
+    }
+
     @ApiOperation(value = "회원수정")
     @PatchMapping
     public ResponseDto<?> updateMember(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){

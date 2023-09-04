@@ -24,7 +24,7 @@ public class Board extends BaseTimeEntity{
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id") // 외래키 설정
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ColumnDefault("0")
