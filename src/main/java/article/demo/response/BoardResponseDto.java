@@ -2,17 +2,12 @@ package article.demo.response;
 
 import article.demo.domain.Board;
 import article.demo.domain.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
 public class BoardResponseDto {
     private Long id;

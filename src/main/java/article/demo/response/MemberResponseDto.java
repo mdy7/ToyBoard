@@ -1,17 +1,12 @@
 package article.demo.response;
 
 import article.demo.domain.Board;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
 public class MemberResponseDto {
     private Long id;

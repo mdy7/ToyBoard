@@ -1,10 +1,12 @@
 package article.demo.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
+@Data
+@Builder
 public class ResponseDto<T> {
     private boolean success;
     private String message;
