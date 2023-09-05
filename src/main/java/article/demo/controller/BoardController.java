@@ -1,24 +1,18 @@
 package article.demo.controller;
 
 
-import article.demo.domain.Board;
 import article.demo.request.BoardCommentRequestDto;
 import article.demo.request.BoardRequestDto;
 import article.demo.request.PageRequestDto;
-import article.demo.response.BoardResponseDto;
 import article.demo.response.ResponseDto;
 import article.demo.service.BoardCommentService;
 import article.demo.service.BoardService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -48,6 +42,16 @@ public class BoardController {
         return boardService.pagingBoards(pageRequestDto);
     }
 
+    @ApiOperation(value = "게시글 검색으로 조회")
+    @GetMapping("/board-search")
+    public ResponseDto<?> boardList(
+            @RequestParam(required = false, defaultValue = "") String searchText,
+            @RequestParam(required = false, defaultValue = "") String searchType,
+            @RequestBody PageRequestDto pageRequestDto) {
+        return boardService.searchBoard(searchText, searchType, pageRequestDto);
+
+    }
+
     @ApiOperation(value = "게시글 상세 조회")
     @GetMapping("/{boardId}")
     public ResponseDto<?> boardDetail(@PathVariable Long boardId){
@@ -57,7 +61,8 @@ public class BoardController {
 
     @ApiOperation(value = "게시글 수정")
     @PatchMapping("/{boardId}")
-    public ResponseDto<?> boardUpdate(@PathVariable("boardId") Long boardId, @RequestBody BoardRequestDto boardRequestDto, HttpSession session) {
+    public ResponseDto<?> boardUpdate(@PathVariable("boardId") Long boardId,
+                                      @RequestBody BoardRequestDto boardRequestDto, HttpSession session) {
         String username = (String) session.getAttribute("username");
         return boardService.updateBoard(boardId, boardRequestDto, username);
     }
@@ -71,7 +76,8 @@ public class BoardController {
 
     @ApiOperation(value = "게시글 댓글 작성")
     @PostMapping("/{boardId}/comment")
-    public ResponseDto<?> addComment(@PathVariable("boardId") Long boardId, @RequestBody BoardCommentRequestDto boardCommentRequestDto, HttpSession session) {
+    public ResponseDto<?> addComment(@PathVariable("boardId") Long boardId,
+                                     @RequestBody BoardCommentRequestDto boardCommentRequestDto, HttpSession session) {
         String username = (String) session.getAttribute("username");
         return boardCommentService.saveBoardCommentParent(boardId,boardCommentRequestDto, username);
     }
@@ -84,7 +90,8 @@ public class BoardController {
 
     @ApiOperation(value = "게시글 댓글 삭제")
     @DeleteMapping("/{boardId}/comment/{commentId}")
-    public ResponseDto<?> commentDelete(@PathVariable("commentId") Long commentId, @PathVariable String boardId, HttpSession session) {
+    public ResponseDto<?> commentDelete(@PathVariable("commentId") Long commentId,
+                                        @PathVariable String boardId, HttpSession session) {
         String username = (String) session.getAttribute("username");
         return boardCommentService.deleteCommentById(commentId,username);
     }

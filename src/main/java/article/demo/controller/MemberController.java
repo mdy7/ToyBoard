@@ -38,16 +38,18 @@ public class MemberController {
     }
 
     @ApiOperation(value = "회원수정")
-    @PatchMapping
-    public ResponseDto<?> updateMember(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){
+    @PatchMapping("/{memberId}")
+    public ResponseDto<?> updateMember(@PathVariable Long memberId,
+                                       @RequestBody MemberRequestDto memberRequestDto, HttpSession session){
         String username = (String) session.getAttribute("username");
-        return memberService.updateMember(memberRequestDto,username);
+        return memberService.updateMember(memberRequestDto,username,memberId);
     }
 
     @ApiOperation(value = "회원 삭제")
     @DeleteMapping("/{memberId}")
     public ResponseDto<?> deleteMember(@PathVariable Long memberId,HttpSession session) {
-        return memberService.deleteMember(memberId);
+        String username = (String) session.getAttribute("username");
+        return memberService.deleteMember(memberId,username);
     }
 
     @ApiOperation(value = "로그인")

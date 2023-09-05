@@ -71,24 +71,41 @@ public class BoardService {
     /**
      * 게시글 조회
      */
-    public Page<Board> searchBoard(String searchText, String searchType, Pageable pageable) {
+    public ResponseDto<?> searchBoard(String searchText, String searchType, PageRequestDto pageRequestDto) {
+        Pageable pageable = PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize());
         Page<Board> boards;
         switch (searchType) {
             case "title":
+                log.info("title 검색");
                 boards = boardRepository.findByTitleContaining(searchText, pageable);
                 break;
             case "content":
+                log.info("content 검색 ");
                 boards = boardRepository.findByContentContaining(searchText, pageable);
                 break;
             case "createdBy":
+                log.info("createdBy 검색");
                 boards = boardRepository.findByCreatedByContaining(searchText, pageable);
                 break;
             default:
-                boards = boardRepository.findByTitleContainingOrContentContaining(searchText, searchText, pageable);
+                boards = boardRepository.findAll(pageable);
                 break;
         }
-        return boards;
+        List<BoardResponseDto> pageBoards = boards.getContent()
+                .stream()
+                .map(BoardResponseDto::toDto)
+                .collect(Collectors.toList());
+
+        return ResponseDto.success("게시글 검색으로 조회",
+                PageResponseDto.builder()
+                    .nowPage(boards.getPageable().getPageNumber())
+                    .startPage(boards.getPageable().getPageNumber())
+                    .endPage(boards.getTotalPages() - 1)
+                    .totalPages(boards.getTotalPages())
+                    .boards(pageBoards)
+                    .build());
     }
+
 
     public ResponseDto<?> getBoards() {
         List<Board> boards = boardRepository.findAll();

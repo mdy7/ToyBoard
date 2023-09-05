@@ -123,9 +123,15 @@ public class MemberService {
      * 회원 수정
      */
     @Transactional
-    public ResponseDto<?> updateMember(MemberRequestDto memberRequestDto, String username) {
-        Member member = memberRepository.getMemberByUsername(username);
+    public ResponseDto<?> updateMember(MemberRequestDto memberRequestDto, String username,Long memberId) {
+        Member sessionMember = memberRepository.getMemberByUsername(username);
 
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new IllegalStateException("존재하지 않는 아이디 입니다"));
+
+        if(!sessionMember.equals(member)){
+            throw new IllegalStateException("수정 권한이 없습니다");
+        }
         if (!memberRequestDto.getPassword().equals(memberRequestDto.getPasswordConfirm())) {
             return ResponseDto.fail("PASSWORDS_NOT_MATCHED", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
@@ -148,9 +154,15 @@ public class MemberService {
      * 회원 삭제
      */
     @Transactional
-    public ResponseDto<?> deleteMember(Long memberId) {
+    public ResponseDto<?> deleteMember(Long memberId,String username) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new IllegalStateException("없는 아이디 입니다"));
+
+        Member sessionMember = memberRepository.getMemberByUsername(username);
+
+        if(!sessionMember.equals(member)){
+            throw new IllegalStateException("삭제 권한이 없습니다");
+        }
 
         memberRepository.delete(member);
 
