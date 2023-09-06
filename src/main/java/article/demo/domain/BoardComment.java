@@ -1,16 +1,13 @@
 package article.demo.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
@@ -36,12 +33,14 @@ public class BoardComment extends BaseTimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @OnDelete(action = OnDeleteAction.CASCADE) // 연관된 Member가 삭제되면 같이 삭제됨
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private BoardComment parent;
 
+    @Builder.Default
     @OneToMany(mappedBy = "parent", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<BoardComment> children = new ArrayList<>();
 }

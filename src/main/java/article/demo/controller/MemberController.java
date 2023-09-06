@@ -55,7 +55,8 @@ public class MemberController {
     @ApiOperation(value = "로그인")
     @PostMapping("/login")
     public ResponseDto<?> login(@RequestBody MemberRequestDto memberRequestDto, HttpSession session){
-        ResponseDto<?> responseDto = memberService.login(memberRequestDto);
+        String username = (String) session.getAttribute("username");
+        ResponseDto<?> responseDto = memberService.login(memberRequestDto,username);
         session.setAttribute("username", memberRequestDto.getUsername());
         session.setMaxInactiveInterval(1800);  // 세션 유지시간 30분
         return responseDto;

@@ -1,9 +1,7 @@
 package article.demo.response;
 
 import article.demo.domain.Board;
-import article.demo.domain.Member;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 

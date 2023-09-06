@@ -1,11 +1,9 @@
 package article.demo.service;
 
 
-import article.demo.domain.Board;
 import article.demo.domain.Member;
 import article.demo.request.MemberRequestDto;
 import article.demo.repository.MemberRepository;
-import article.demo.response.BoardResponseDto;
 import article.demo.response.MemberResponseDto;
 import article.demo.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +66,11 @@ public class MemberService {
     /**
      * 로그인
      */
-    public ResponseDto<?> login(MemberRequestDto memberRequestDto) {
+    public ResponseDto<?> login(MemberRequestDto memberRequestDto,String username) {
+        if(null != username){
+            return ResponseDto.fail("DUPLICATE_LOGIN", "이미 로그인 되었습니다");
+        }
+
         Member member = isPresentUsername(memberRequestDto.getUsername());
 
         if (null == member) {
