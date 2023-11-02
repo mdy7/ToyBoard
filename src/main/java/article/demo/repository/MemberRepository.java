@@ -8,11 +8,10 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    default Member getMemberByUsername(String username) {
+    default Member findByUsernameOrElseThrow(String username) {
         return findByUsername(username).orElseThrow(() ->
                 new IllegalStateException("로그인이 필요 합니다"));
     }
-
 
     Optional<Member> findByUsername(String username);
 

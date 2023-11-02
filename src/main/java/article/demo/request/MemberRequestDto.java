@@ -7,7 +7,6 @@ import lombok.*;
 @Builder
 public class MemberRequestDto {
 
-    private Long id;
     private String username;
     private String password;
     private String passwordConfirm;

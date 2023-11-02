@@ -16,9 +16,11 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "board")
 public class Board extends BaseTimeEntity{
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
     private Long id;
+
     private String title;
     private String content;
     private String createdBy;
@@ -27,7 +29,6 @@ public class Board extends BaseTimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    @OnDelete(action = OnDeleteAction.CASCADE) // 연관된 Member가 삭제되면 같이 삭제됨
     private Member member;
 
     @ColumnDefault("0")

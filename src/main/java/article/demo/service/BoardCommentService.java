@@ -33,9 +33,9 @@ public class BoardCommentService {
      */
 
     @Transactional
-    public ResponseDto<?> saveBoardCommentParent(Long boardId,BoardCommentRequestDto boardCommentRequestDto, String username) {
-        Board board = boardRepository.getBoard(boardId);
-        Member member = memberRepository.getMemberByUsername(username);
+    public ResponseDto<BoardCommentResponseDto> saveBoardComment(Long boardId, BoardCommentRequestDto boardCommentRequestDto, String username) {
+        Board board = boardRepository.findByBoardOrElseThrow(boardId);
+        Member member = memberRepository.findByUsernameOrElseThrow(username);
 
         nullCheckCommentForm(boardCommentRequestDto, "댓글 내용을 입력해주세요");
 
@@ -43,11 +43,11 @@ public class BoardCommentService {
             // 부모 댓글 작성
             BoardComment boardComment = BoardComment.builder()
                     .createdBy(member.getUsername())
+                    .content(boardCommentRequestDto.getContent())
                     .deleteCheck(false)
                     .member(member)
                     .board(board)
-                    .parent(null) // 대댓글이 아니므로 parent 필드는 null로 설정
-                    .content(boardCommentRequestDto.getContent())
+                    .parent(null) // 대댓글이 아니므로 parent 필드는 null로 설정x
                     .build();
 
             boardCommentRepository.save(boardComment);
@@ -88,8 +88,8 @@ public class BoardCommentService {
     /**
      * 댓글 조회
      */
-    public ResponseDto<?> getComments(Long boardId) {
-        boardRepository.getBoard(boardId);
+    public ResponseDto<List<BoardCommentResponseDto>> findComments(Long boardId) {
+        boardRepository.findByBoardOrElseThrow(boardId);
         List<BoardComment> boardComments = boardCommentRepository.findByBoardId(boardId);
         List<BoardCommentResponseDto> boardCommentResponseDto = new ArrayList<>();
 
@@ -97,19 +97,22 @@ public class BoardCommentService {
             BoardCommentResponseDto dto = BoardCommentResponseDto.toDto(boardComment);
             boardCommentResponseDto.add(dto);
         }
+
+
         return ResponseDto.success("댓글 조회 성공" ,boardCommentResponseDto);
     }
+
 
 
     /**
      * 댓글 삭제
      */
     @Transactional
-    public ResponseDto<?> deleteCommentById(Long commentId,String username) {
+    public ResponseDto<Void> deleteCommentById(Long commentId,String username) {
         BoardComment comment = boardCommentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalStateException("해당 댓글이 존재하지 않습니다."));
 
-        memberRepository.getMemberByUsername(username);
+        memberRepository.findByUsernameOrElseThrow(username);
 
         if (!comment.getCreatedBy().equals(username)) {
             throw new IllegalStateException("해당 댓글 작성자가 아닙니다.");

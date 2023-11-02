@@ -1,4 +1,4 @@
-package article.demo.controller;
+package article.demo;
 
 import article.demo.response.ResponseDto;
 import org.apache.catalina.connector.Response;

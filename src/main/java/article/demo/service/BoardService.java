@@ -40,8 +40,8 @@ public class BoardService {
      * 게시글 생성
      */
     @Transactional
-    public ResponseDto<?> saveBoard(BoardRequestDto boardRequestDto, String username) {
-        Member member = memberRepository.getMemberByUsername(username);
+    public ResponseDto<BoardResponseDto> saveBoard(BoardRequestDto boardRequestDto, String username) {
+        Member member = memberRepository.findByUsernameOrElseThrow(username);
         nullCheckBoard(boardRequestDto);
 
         boardRequestDto.updateCreateBy(member.getUsername(), 1L, 0L, member);
@@ -71,7 +71,7 @@ public class BoardService {
     /**
      * 게시글 조회
      */
-    public ResponseDto<?> searchBoard(String searchText, String searchType, PageRequestDto pageRequestDto) {
+    public ResponseDto<PageResponseDto> searchBoard(String searchText, String searchType, PageRequestDto pageRequestDto) {
         Pageable pageable = PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize());
         Page<Board> boards;
         switch (searchType) {
@@ -107,7 +107,7 @@ public class BoardService {
     }
 
 
-    public ResponseDto<?> getBoards() {
+    public ResponseDto<List<BoardResponseDto>> allBoards() {
         List<Board> boards = boardRepository.findAll();
         List<BoardResponseDto> boardDto = boards.stream() // 스트림으로 변환 (스트림이란? 여러 요소를 연속적으로 처리할 수 있는 데이터 흐름)
                 .map(BoardResponseDto::toDto) // 각 board 객체를 dto로 변환
@@ -115,7 +115,7 @@ public class BoardService {
         return ResponseDto.success("게시물 전체 조회", boardDto);
     }
 
-    public ResponseDto<?> pagingBoards(PageRequestDto pageRequestDto) {
+    public ResponseDto<PageResponseDto> pagingAllBoards(PageRequestDto pageRequestDto) {
         Pageable pageable = PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize());
         Page<Board> boardPage = boardRepository.findAll(pageable);
 
@@ -144,7 +144,7 @@ public class BoardService {
      * 게시글 수정
      */
     @Transactional
-    public ResponseDto<?> updateBoard(Long boardId, BoardRequestDto boardRequestDto, String username) {
+    public ResponseDto<BoardResponseDto> updateBoard(Long boardId, BoardRequestDto boardRequestDto, String username) {
         Board board = validationWriter(username, boardId);
 
         board.updateBoard(boardRequestDto.getTitle(), boardRequestDto.getContent());
@@ -171,7 +171,7 @@ public class BoardService {
      * 게시글 삭제
      */
     @Transactional
-    public ResponseDto<?> deleteBoard(Long boardId, String username) {
+    public ResponseDto<Void> deleteBoard(Long boardId, String username) {
         Board board = validationWriter(username, boardId);
 
         List<BoardComment> comments = boardCommentRepository.findByBoardId(board.getId());
@@ -187,7 +187,7 @@ public class BoardService {
      */
     @Transactional
     public Board updateVisit(Long id) {
-        Board board = boardRepository.getBoard(id);
+        Board board = boardRepository.findByBoardOrElseThrow(id);
 
         Long countVisit = board.getCountVisit();
 
@@ -200,8 +200,8 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseDto<?> boardDetail(Long boardId) {
-        Board board = boardRepository.getBoard(boardId);
+    public ResponseDto<BoardResponseDto> boardDetail(Long boardId) {
+        Board board = boardRepository.findByBoardOrElseThrow(boardId);
 
         // 조회수 증가
         Long countVisit = board.getCountVisit();
@@ -220,9 +220,9 @@ public class BoardService {
      * 좋아요 눌렀을때
      */
     @Transactional
-    public ResponseDto<?> insertLike(String username, Long boardId) {
-        Member member = memberRepository.getMemberByUsername(username);
-        Board board = boardRepository.getBoard(boardId);
+    public ResponseDto<Void> insertLike(String username, Long boardId) {
+        Member member = memberRepository.findByUsernameOrElseThrow(username);
+        Board board = boardRepository.findByBoardOrElseThrow(boardId);
 
         if (boardLikeRepository.findByMemberAndBoard(member, board).isPresent()) {
             throw new IllegalStateException("이미 좋아요 누른 게시글입니다.");
@@ -247,9 +247,9 @@ public class BoardService {
      * 검증
      */
     public Board validationWriter(String username, Long id) {
-        Board board = boardRepository.getBoard(id);
+        Board board = boardRepository.findByBoardOrElseThrow(id);
 
-        memberRepository.getMemberByUsername(username);
+        memberRepository.findByUsernameOrElseThrow(username);
 
         if (!board.getCreatedBy().equals(username)) {
             throw new IllegalStateException("작성자가 아닙니다.");
@@ -258,7 +258,6 @@ public class BoardService {
     }
 
     private void nullCheckBoard(BoardRequestDto boardRequestDto) {
-        // null 공백 체크
         if (boardRequestDto.getTitle() == null || boardRequestDto.getTitle().isEmpty()) {
             throw new IllegalStateException("제목을 입력해주세요");
         }

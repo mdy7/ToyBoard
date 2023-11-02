@@ -1,7 +1,5 @@
 package article.demo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,9 +30,9 @@ public class Member extends BaseTimeEntity{
 
     private String email;
 
-    @Builder.Default
+/*    @Builder.Default
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<Board> boards = new ArrayList<>();
+    private List<Board> boards = new ArrayList<>();*/
 
     public void update(String password,String email){
         this.password = password;

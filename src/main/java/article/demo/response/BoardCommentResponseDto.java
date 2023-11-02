@@ -2,8 +2,10 @@ package article.demo.response;
 
 
 import article.demo.domain.BoardComment;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,8 +18,8 @@ public class BoardCommentResponseDto {
     private Long id;
     private String content;
     private String createdBy;
-    //private List<BoardComment> children;
 
+    private List<BoardComment> children = new ArrayList<>();
 
     public static BoardCommentResponseDto toDto(BoardComment boardComment) {
         return BoardCommentResponseDto.builder()
@@ -26,16 +28,7 @@ public class BoardCommentResponseDto {
                 .id(boardComment.getId())
                 .content(boardComment.getContent())
                 .createdBy(boardComment.getMember().getUsername())
-                //.children(boardComment.getChildren())
+                .children(boardComment.getChildren())
                 .build();
-    }
-
-    @Getter
-    @Setter
-    public static class Children {
-        private Long id;
-        private Long parentId;
-        private String content;
-        private String createdBy;
     }
 }

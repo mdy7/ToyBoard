@@ -1,8 +1,6 @@
 package article.demo.domain;
 
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -18,7 +16,7 @@ public class BoardLike extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "heart_id")
+    @Column(name = "like_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)
@@ -30,3 +28,4 @@ public class BoardLike extends BaseTimeEntity{
     private Board board;
 
 }
+

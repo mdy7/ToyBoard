@@ -7,7 +7,6 @@ import lombok.*;
 @Builder
 public class BoardRequestDto {
 
-    private Long id;
     private String title;
     private String content;
     private String createdBy;

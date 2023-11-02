@@ -27,7 +27,7 @@ public class MemberService {
      * 회원가입
      */
     @Transactional
-    public ResponseDto<?> join(MemberRequestDto memberRequestDto) {
+    public ResponseDto<MemberResponseDto> join(MemberRequestDto memberRequestDto) {
         if (null != isPresentUsername(memberRequestDto.getUsername())) {
             return ResponseDto.fail("DUPLICATED_USERNAME", "이미 사용중인 아이디 입니다.");
         }
@@ -66,7 +66,7 @@ public class MemberService {
     /**
      * 로그인
      */
-    public ResponseDto<?> login(MemberRequestDto memberRequestDto,String username) {
+    public ResponseDto<MemberResponseDto> login(MemberRequestDto memberRequestDto,String username) {
         if(null != username){
             return ResponseDto.fail("DUPLICATE_LOGIN", "이미 로그인 되었습니다");
         }
@@ -93,7 +93,7 @@ public class MemberService {
     /**
      * 회원 전체 조회
      */
-    public ResponseDto<?> memberList() {
+    public ResponseDto<List<MemberResponseDto>> memberList() {
         List<Member> members = memberRepository.findAll();
         List<MemberResponseDto> memberResponseDto = new ArrayList<>();
 
@@ -108,7 +108,7 @@ public class MemberService {
         return ResponseDto.success("전체 회원 조회", memberResponseDto);
     }
 
-    public ResponseDto<?> memberDetail(Long memberId) {
+    public ResponseDto<MemberResponseDto> memberDetail(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new IllegalStateException("존재하지 않는 아이디 입니다"));
 
@@ -125,8 +125,8 @@ public class MemberService {
      * 회원 수정
      */
     @Transactional
-    public ResponseDto<?> updateMember(MemberRequestDto memberRequestDto, String username,Long memberId) {
-        Member sessionMember = memberRepository.getMemberByUsername(username);
+    public ResponseDto<MemberResponseDto> updateMember(MemberRequestDto memberRequestDto, String username,Long memberId) {
+        Member sessionMember = memberRepository.findByUsernameOrElseThrow(username);
 
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new IllegalStateException("존재하지 않는 아이디 입니다"));
@@ -156,11 +156,11 @@ public class MemberService {
      * 회원 삭제
      */
     @Transactional
-    public ResponseDto<?> deleteMember(Long memberId,String username) {
+    public ResponseDto<Void> deleteMember(Long memberId,String username) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new IllegalStateException("없는 아이디 입니다"));
 
-        Member sessionMember = memberRepository.getMemberByUsername(username);
+        Member sessionMember = memberRepository.findByUsernameOrElseThrow(username);
 
         if(!sessionMember.equals(member)){
             throw new IllegalStateException("삭제 권한이 없습니다");
@@ -173,7 +173,7 @@ public class MemberService {
 
 
     public Member getUsernameForm(String username) {
-        return memberRepository.getMemberByUsername(username);
+        return memberRepository.findByUsernameOrElseThrow(username);
     }
 
     /**

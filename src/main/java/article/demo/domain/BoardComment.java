@@ -1,5 +1,9 @@
 package article.demo.domain;
 
+import article.demo.response.BoardCommentResponseDto;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -7,6 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -18,7 +23,7 @@ import java.util.List;
 public class BoardComment extends BaseTimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_comment_id")
+    @Column(name = "comment_id")
     private Long id;
 
     @Column(nullable = false, length = 1000)
@@ -33,14 +38,13 @@ public class BoardComment extends BaseTimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    @OnDelete(action = OnDeleteAction.CASCADE) // 연관된 Member가 삭제되면 같이 삭제됨
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private BoardComment parent;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "parent", orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<BoardComment> children = new ArrayList<>();
+
 }
